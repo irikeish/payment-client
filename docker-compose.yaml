@@ -1,0 +1,8 @@
+version: '3.5'
+services:
+  payment-client:
+    build: .
+    ports:
+      - 81:80
+    volumes:
+      - ./:/var/www/html

@@ -1,0 +1,23 @@
+{
+  "name" : "lms/payment-client",
+  "description" : "Lms Payment client",
+  "authors" : [{
+    "name" : "Irikeish",
+    "email" : "atish.kumar@tripock.com"
+  }
+  ],
+  "require" : {
+    "php" : "^7.0",
+    "rakit/validation": "^1.2",
+    "guzzlehttp/guzzle": "^6.5"
+  },
+  "require-dev" : {
+    "fzaninotto/faker": "~1.4",
+    "phpunit/phpunit": "~6.0"
+  },
+  "autoload" : {
+    "psr-4" : {
+      "lms\\PaymentClient\\": "src/PaymentClient"
+    }
+  }
+}
