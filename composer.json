@@ -11,6 +11,11 @@
     "rakit/validation": "^1.2",
     "guzzlehttp/guzzle": "^6.5"
   },
+  "config": {
+    "optimize-autoloader": true,
+    "preferred-install": "dist",
+    "sort-packages": true
+  },
   "require-dev" : {
     "fzaninotto/faker": "~1.4",
     "phpunit/phpunit": "~6.0"
