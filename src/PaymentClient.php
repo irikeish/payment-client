@@ -4,6 +4,7 @@
 namespace lms\PaymentClient;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
 use Rakit\Validation\Validator;
 
 class PaymentClient
@@ -12,7 +13,7 @@ class PaymentClient
     private $base_url;
     private $app_key;
 
-    public function _construct($base_url="payment\api",$key="uwtqeijugsajdgw564e6e5tfhsaluwqiwqha"){
+    public function __construct($base_url="http://payment/api",$key="uwtqeijugsajdgw564e6e5tfhsaluwqiwqha"){
         $this->base_url = $base_url;
         $this->app_key = $key;
     }
@@ -47,30 +48,33 @@ class PaymentClient
 
                 if($total_amount_pay != $data['total_amount']){
                     return ['status'=>false,'message'=>"Total amount is not sum up with payment breakup"];
-                 }
+                }
 
-                $client = new Client();
-                $url = $this->base_url.'\payment';
-
-                $head = [
-                    'app_key' => $this->app_key
-                ];
-
-                $body = $data;
+                $client = new Client(['headers' => [ 'Content-Type' => 'application/json',"app_key"=>$this->app_key ]]);
+                $url = $this->base_url.'/payment';
 
                 $content = [
-                    'head' => $head,
-                    'body' => $body
+                    'body' => json_encode($data)
                 ];
 
-                $res = $client->post($url, [
-                    'json' => $content
-                ]);
-
-                dd($res->json());
+                $res = $client->post($url, $content);
+                $response_data = json_decode($res->getBody()->getContents(),true);
+                $payload = $response_data['payload'];
+                $payload_data = $payload['data'];
+                $message = $payload['message'];
+                return ['status'=>true,'message'=>$message,'transaction_id'=>implode(':',$payload_data['transaction_id'])];
             }
-        }catch (\Exception $ex){
 
+        }catch (ClientException $ex){
+            if($ex->hasResponse()){
+                $response_data = json_decode($ex->getResponse()->getBody()->getContents(),true);
+                $payload = $response_data['payload'];
+                return ['status'=>false,"message"=>$payload['message']];
+            }
+            return ['status'=>false,'message'=>"some payment service connection error with no error response"];
+        }
+        catch (\Exception $ex){
+            return ["status"=>false,"message"=>"some client error, contact to developer",'ex'=>$ex];
         }
     }
 
