@@ -5,7 +5,6 @@ namespace lms\PaymentClient;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
-use Rakit\Validation\Validator;
 
 class PaymentClient
 {
@@ -18,22 +17,68 @@ class PaymentClient
         $this->app_key = $key;
     }
 
+    private function validatePaymentRequestData(array $data=[]){
+        try{
+
+            $validation_error = [];
+
+            if(!isset($data['user_id'])){
+                array_push($validation_error,"user_id is required");
+            }
+            if(!isset($data['order_id'])){
+                array_push($validation_error,"order_id is required");
+            }
+
+            if(!isset($data['payment_breakup'])){
+                array_push($validation_error,"payment breakup is required");
+            }else  if(!is_array($data['payment_breakup'])){
+                array_push($validation_error,"payment_breakup should be array");
+            }else if(is_array($data['payment_breakup'])){
+
+                $payment_breakup = $data['payment_breakup'];
+                if(sizeof($payment_breakup) == 0){
+                    array_push($validation_error,"payment_breakup can not be empty array");
+                }
+                foreach ($payment_breakup as $payment_data){
+
+                    if(!isset($payment_data['type']) || !isset($payment_data['amount'])){
+                        array_push($validation_error,"payment breakup tuple is not a valid, it should have valid type and amount");
+                    }else {
+                        $payment_by = $payment_data['type'];
+                        $amount = $payment_data['amount'];
+
+                        if(!is_numeric($amount) || ( is_numeric($amount) && $amount < 0)){
+                            array_push($validation_error,"payment breakup for".$payment_by."has given amount: ".$amount." is not valid");
+                        }
+                    }
+
+                }
+            }
+
+            if(!isset($data['total_amount'])){
+                array_push($validation_error,"total amount is required");
+            }else if(!is_numeric($data['total_amount']) || ( is_numeric($data['total_amount']) && $data['total_amount'] < 0) ){
+                array_push($validation_error,"total amount is not a valid amount");
+            }
+
+            if(sizeof($validation_error)>0){
+                return ["status"=>false,"message"=>$validation_error];
+            }
+
+            return ['status'=>true];
+
+        }catch (\Exception $ex){
+            return ["status"=>false,"message"=>"validation exception, contact developer for support","ex"=>$ex];
+        }
+    }
+
     public function doRequest(array $data=[]){
         try{
 
-            $validator = new Validator;
+            $validation = $this->validatePaymentRequestData($data);
 
-            $validation = $validator->validate($data, [
-                'user_id'                  => 'required',
-                'order_id'                 => 'required',
-                'payment_breakup' => 'required|array',
-                'payment_breakup.*.amount' => 'required|numeric',
-                'total_amount' => 'required|numeric'
-            ]);
-
-            if ($validation->fails()) {
-                $errors = $validation->errors();
-                return ['status'=>false,'message'=>"Invalid Payload"];
+            if (!$validation['status']) {
+                return $validation;
             } else {
 
                 $payment_breakup = $data['payment_breakup'];
