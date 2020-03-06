@@ -5,6 +5,7 @@ namespace lms\PaymentClient;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\RequestException;
 
 class PaymentClient
 {
@@ -48,7 +49,7 @@ class PaymentClient
                         $amount = $payment_data['amount'];
 
                         if(!is_numeric($amount) || ( is_numeric($amount) && $amount < 0)){
-                            array_push($validation_error,"payment breakup for".$payment_by."has given amount: ".$amount." is not valid");
+                            array_push($validation_error,"payment breakup for ".$payment_by." has given amount: ".$amount." is not valid");
                         }
                     }
 
@@ -99,7 +100,7 @@ class PaymentClient
                 $url = $this->base_url.'/payment';
 
                 $content = [
-                    'body' => json_encode($data)
+                    'json' => $data
                 ];
 
                 $res = $client->post($url, $content);
@@ -107,10 +108,17 @@ class PaymentClient
                 $payload = $response_data['payload'];
                 $payload_data = $payload['data'];
                 $message = $payload['message'];
-                return ['status'=>true,'message'=>$message,'transaction_id'=>implode(':',$payload_data['transaction_id'])];
+                return ['status'=>$response_data['status'],'message'=>$message,'transaction_id'=>implode(':',$payload_data['transaction_id'])];
             }
 
         }catch (ClientException $ex){
+            if($ex->hasResponse()){
+                $response_data = json_decode($ex->getResponse()->getBody()->getContents(),true);
+                $payload = $response_data['payload'];
+                return ['status'=>false,"message"=>$payload['message']];
+            }
+            return ['status'=>false,'message'=>"some payment service connection error with no error response"];
+        }catch (RequestException $ex){
             if($ex->hasResponse()){
                 $response_data = json_decode($ex->getResponse()->getBody()->getContents(),true);
                 $payload = $response_data['payload'];
@@ -123,12 +131,72 @@ class PaymentClient
         }
     }
 
-    public function checkStatus($order_id,$transaction_id){
+    public function checkStatus(array $data=[]){
 
         try{
 
-        }catch (\Exception $ex){
+            if (!$data['order_id'] || !$data['transaction_id']) {
+                throw new \Exception("Invalid Request parameters");
+            } else {
 
+                $client = new Client(['headers' => [ 'Content-Type' => 'application/json',"app_key"=>$this->app_key ]]);
+                $url = $this->base_url.'/status';
+
+                $head = [];
+                $body = $data;
+
+                $content = [
+                    'json' => ($data)
+                ];
+                // var_dump($data);
+                $res = $client->post($url, $content);
+                $response_str = $res->getBody()->getContents();
+
+                $response_data = json_decode($response_str,true);
+
+                // var_dump($response_data);
+                // die();
+
+
+                $payload = $response_data['payload'];
+
+                $payload_data = $payload['data'];
+
+                $message = '';
+                $status='';
+                // var_dump($payload_data);
+                foreach( $payload_data as $type ) {
+                    // var_dump($type['status']);
+                    $status=strtoupper($type['status']);
+                    if ( $type['status'] == 'failed' || $type['status'] == 'pending') {
+
+                        $message = $type['payment_method'].' payment '.$type['status'];
+                        $status=strtoupper($type['status']);
+                        break;
+
+                    }
+                }
+
+                return ['resultStatus'=>$status,'message'=>$message,'status_response'=>$payload_data];
+            }
+
+        }catch (ClientException $ex){
+            if($ex->hasResponse()){
+                $response_data = json_decode($ex->getResponse()->getBody()->getContents(),true);
+                $payload = $response_data['payload'];
+                return ['status'=>false,"message"=>$payload['message']];
+            }
+            return ['status'=>false,'message'=>"some payment service connection error with no error response"];
+        }catch (RequestException $ex){
+            if($ex->hasResponse()){
+                $response_data = json_decode($ex->getResponse()->getBody()->getContents(),true);
+                $payload = $response_data['payload'];
+                return ['status'=>false,"message"=>$payload['message']];
+            }
+            return ['status'=>false,'message'=>"some payment service connection error with no error response"];
+        }
+        catch (\Exception $ex){
+            return ["status"=>false,"message"=>"some client error, contact to developer",'ex'=>$ex];
         }
 
     }
