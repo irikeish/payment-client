@@ -239,4 +239,115 @@ class PaymentClient
         }
     }
 
+    public function revert(array $data=[]){
+        
+        try{
+            
+            if (!$data['transaction_ids']) {
+                throw new \Exception("Invalid Request parameters");
+            } else {
+                $client = new Client(['headers' => [ 'Content-Type' => 'application/json',"app_key"=>$this->app_key ]]);
+                $url = $this->base_url.'/revert';
+
+
+                $head = [];
+                $body = $data;
+
+                $content = [
+                    'json' => ($data)
+                ];
+                $res = $client->post($url, $content);
+                
+                $response_str = $res->getBody()->getContents();
+
+                $response_data = json_decode($response_str,true);
+
+                $payload = $response_data['payload'];
+
+
+                $message = '';
+                $status='';
+                
+
+                return ['resultStatus'=>$response_data['status'],'message'=>$payload['message'],'data'=>$payload['data']];
+            }
+
+        }catch (ClientException $ex){
+            if($ex->hasResponse()){
+                $response_data = json_decode($ex->getResponse()->getBody()->getContents(),true);
+                $payload = $response_data['payload'];
+                return ['status'=>false,"message"=>$payload['message']];
+            }
+            return ['status'=>false,'message'=>"some payment service connection error with no error response"];
+        }catch (RequestException $ex){
+            if($ex->hasResponse()){
+                $response_data = json_decode($ex->getResponse()->getBody()->getContents(),true);
+                $payload = $response_data['payload'];
+                return ['status'=>false,"message"=>$payload['message']];
+            }
+            return ['status'=>false,'message'=>"some payment service connection error with no error response"];
+        }
+        catch (\Exception $ex){
+            return ["status"=>false,"message"=>"some client error, contact to developer",'ex'=>$ex];
+        }
+
+    }
+
+
+    public function revertStatus(array $data=[]){
+        
+        try{
+            
+            if (!$data['transaction_ids']) {
+                throw new \Exception("Invalid Request parameters");
+            } else {
+                $client = new Client(['headers' => [ 'Content-Type' => 'application/json',"app_key"=>$this->app_key ]]);
+                $url = $this->base_url.'/revertStatus';
+
+
+                $head = [];
+                $body = $data;
+
+                $content = [
+                    'json' => ($data)
+                ];
+                $res = $client->post($url, $content);
+                
+                $response_str = $res->getBody()->getContents();
+
+                $response_data = json_decode($response_str,true);
+
+                $payload = $response_data['payload'];
+
+
+                $message = '';
+                $status='';
+                
+
+                return ['resultStatus'=>$response_data['status'],'message'=>$payload['message'],'data'=>$payload['data']];
+            }
+
+        }catch (ClientException $ex){
+            if($ex->hasResponse()){
+                $response_data = json_decode($ex->getResponse()->getBody()->getContents(),true);
+                $payload = $response_data['payload'];
+                return ['status'=>false,"message"=>$payload['message']];
+            }
+            return ['status'=>false,'message'=>"some payment service connection error with no error response"];
+        }catch (RequestException $ex){
+            if($ex->hasResponse()){
+                $response_data = json_decode($ex->getResponse()->getBody()->getContents(),true);
+                $payload = $response_data['payload'];
+                return ['status'=>false,"message"=>$payload['message']];
+            }
+            return ['status'=>false,'message'=>"some payment service connection error with no error response"];
+        }
+        catch (\Exception $ex){
+            return ["status"=>false,"message"=>"some client error, contact to developer",'ex'=>$ex];
+        }
+
+    }
+
+
+
 }
