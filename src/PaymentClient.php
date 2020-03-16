@@ -200,7 +200,58 @@ class PaymentClient
         }
 
     }
-    
+
+    public function registerMachine(array $data =[]) {
+        // var_dump($data);
+        // die();
+        try{
+
+            if (!isset($data['user_id'])) {
+                throw new \Exception("User id is required.");
+            }
+
+            if (!isset($data['machine_type'])) {
+                throw new \Exception("Machine type is required.");
+            }
+
+            $user_id = $data['user_id'];
+            $client = new Client(['headers' => [ 'Content-Type' => 'application/json',"app_key"=>$this->app_key ]]);
+            $url = $this->base_url.'/registerMachine';
+            $head = [];
+            $body = $data;
+            $content = [
+                'json' => ($data)
+            ];
+            $res = $client->post($url, $content);
+
+            $response_str = $res->getBody()->getContents();
+            $response_data = json_decode($response_str,true);
+
+            $payload = $response_data['payload'];
+            $message = $payload['message'];
+            return ['status'=>$response_data['status'],'message'=>$message,'data'=>$payload['data']];
+
+        }catch (ClientException $ex){
+            if($ex->hasResponse()){
+                $response_data = json_decode($ex->getResponse()->getBody()->getContents(),true);
+                $payload = $response_data['payload'];
+                return ['status'=>false,"message"=>$payload['message']];
+            }
+            return ['status'=>false,'message'=>"some payment client connection error with no error response"];
+        }catch (RequestException $ex){
+            if($ex->hasResponse()){
+                $response_data = json_decode($ex->getResponse()->getBody()->getContents(),true);
+                $payload = $response_data['payload'];
+                return ['status'=>false,"message"=>$payload['message']];
+            }
+            return ['status'=>false,'message'=>"some payment service connection error with no error response"];
+        }
+        catch (\Exception $ex){
+            return ["status"=>false,"message"=>$ex->getMessage(),'ex'=>$ex];
+        }
+
+    }
+
     public function getMachine(array $data = []) {
         try{
             $user_id = $data['user_id'];
