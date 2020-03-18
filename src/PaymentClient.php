@@ -108,7 +108,21 @@ class PaymentClient
                 $payload = $response_data['payload'];
                 $payload_data = $payload['data'];
                 $message = $payload['message'];
-                return ['status'=>$response_data['status'],'message'=>$message,'transaction_id'=>implode(':',$payload_data['transaction_id'])];
+
+                $messageStatus = '';
+                $statusResult='';
+                foreach( $payload_data['transaction_status'] as $type ) {
+                    $statusResult=strtoupper($type['status']);
+                    if ( $type['status'] == 'failed' || $type['status'] == 'pending') {
+
+                        $messageStatus = $type['payment_method'].' payment '.$type['status'];
+                        $statusResult=strtoupper($type['status']);
+                        break;
+
+                    }
+                }
+                $transaction_status=['resultStatus'=>$statusResult,'message'=>$messageStatus,'status_response'=>$payload_data['transaction_status']];
+                return ['status'=>$response_data['status'],'message'=>$message,'transaction_id'=>implode(':',$payload_data['transaction_id']),'transaction_type'=>implode(':',$payload_data['transaction_type']),'transaction_status'=>$transaction_status];
             }
 
         }catch (ClientException $ex){
@@ -291,9 +305,9 @@ class PaymentClient
     }
 
     public function revert(array $data=[]){
-        
+
         try{
-            
+
             if (!$data['transaction_ids']) {
                 throw new \Exception("Invalid Request parameters");
             } else {
@@ -308,7 +322,7 @@ class PaymentClient
                     'json' => ($data)
                 ];
                 $res = $client->post($url, $content);
-                
+
                 $response_str = $res->getBody()->getContents();
 
                 $response_data = json_decode($response_str,true);
@@ -318,7 +332,7 @@ class PaymentClient
 
                 $message = '';
                 $status='';
-                
+
 
                 return ['resultStatus'=>$response_data['status'],'message'=>$payload['message'],'data'=>$payload['data']];
             }
@@ -346,9 +360,9 @@ class PaymentClient
 
 
     public function revertStatus(array $data=[]){
-        
+
         try{
-            
+
             if (!$data['transaction_ids']) {
                 throw new \Exception("Invalid Request parameters");
             } else {
@@ -363,7 +377,7 @@ class PaymentClient
                     'json' => ($data)
                 ];
                 $res = $client->post($url, $content);
-                
+
                 $response_str = $res->getBody()->getContents();
 
                 $response_data = json_decode($response_str,true);
@@ -373,7 +387,7 @@ class PaymentClient
 
                 $message = '';
                 $status='';
-                
+
 
                 return ['resultStatus'=>$response_data['status'],'message'=>$payload['message'],'data'=>$payload['data']];
             }
@@ -398,6 +412,7 @@ class PaymentClient
         }
 
     }
+
 
 
 
