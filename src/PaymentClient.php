@@ -162,15 +162,10 @@ class PaymentClient
                 $content = [
                     'json' => ($data)
                 ];
-                // var_dump($data);
                 $res = $client->post($url, $content);
                 $response_str = $res->getBody()->getContents();
 
                 $response_data = json_decode($response_str,true);
-
-                // var_dump($response_data);
-                // die();
-
 
                 $payload = $response_data['payload'];
 
@@ -178,9 +173,7 @@ class PaymentClient
 
                 $message = '';
                 $status='';
-                // var_dump($payload_data);
                 foreach( $payload_data as $type ) {
-                    // var_dump($type['status']);
                     $status=strtoupper($type['status']);
                     if ( $type['status'] == 'failed' || $type['status'] == 'pending') {
 
@@ -215,9 +208,67 @@ class PaymentClient
 
     }
 
+    public function validateStatus(array $data=[]){
+
+        try{
+
+            if (!$data['driver_response'] || !$data['transaction_id']) {
+                throw new \Exception("Invalid Request parameters");
+            } else {
+
+                $client = new Client(['headers' => [ 'Content-Type' => 'application/json',"app_key"=>$this->app_key ]]);
+                $url = $this->base_url.'/validate';
+
+                $head = [];
+                $body = $data;
+                $content = [
+                    'json' => ($data)
+                ];
+                $res = $client->post($url, $content);
+                $response_str = $res->getBody()->getContents();
+
+                $response_data = json_decode($response_str,true);
+
+                $payload = $response_data['payload'];
+
+                $payload_data = $payload['data'];
+                $status='';
+                foreach( $payload_data as $type ) {
+                    $status=strtoupper($type['status']);
+                    $message = $type['message'];
+                    if ( $type['status'] == 'failed' || $type['status'] == 'pending') {
+                        $status=strtoupper($type['status']);
+                        break;
+
+                    }
+                }
+
+                return ['resultStatus'=>$status,'message'=>$message,'status_response'=>['status'=>$payload_data[0]['status'],'payment_method'=>$payload_data[0]['payment_method'] ]];
+            }
+
+        }catch (ClientException $ex){
+            if($ex->hasResponse()){
+                $response_data = json_decode($ex->getResponse()->getBody()->getContents(),true);
+                $payload = $response_data['payload'];
+                return ['status'=>false,"message"=>$payload['message']];
+            }
+            return ['status'=>false,'message'=>"some payment service connection error with no error response"];
+        }catch (RequestException $ex){
+            if($ex->hasResponse()){
+                $response_data = json_decode($ex->getResponse()->getBody()->getContents(),true);
+                $payload = $response_data['payload'];
+                return ['status'=>false,"message"=>$payload['message']];
+            }
+            return ['status'=>false,'message'=>"some payment service connection error with no error response"];
+        }
+        catch (\Exception $ex){
+            return ["status"=>false,"message"=>"some client error, contact to developer",'ex'=>$ex];
+        }
+
+    }
+
     public function registerMachine(array $data =[]) {
-        // var_dump($data);
-        // die();
+
         try{
 
             if (!isset($data['user_id'])) {
