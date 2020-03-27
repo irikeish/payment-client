@@ -384,8 +384,8 @@ class PaymentClient
                 $message = '';
                 $status='';
 
-
-                return ['resultStatus'=>$response_data['status'],'message'=>$payload['message'],'data'=>$payload['data']];
+                // var_dump($response_str);
+                return ['resultStatus'=>$response_data['status'],'message'=>$payload['message'],'status_response'=>$payload['data']];
             }
 
         }catch (ClientException $ex){
@@ -440,7 +440,7 @@ class PaymentClient
                 $status='';
 
 
-                return ['resultStatus'=>$response_data['status'],'message'=>$payload['message'],'data'=>$payload['data']];
+                return ['resultStatus'=>$response_data['status'],'message'=>$payload['message'],'status_respones'=>$payload['data']];
             }
 
         }catch (ClientException $ex){
