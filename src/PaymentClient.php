@@ -164,9 +164,9 @@ class PaymentClient
                     $total_amount_pay = $total_amount_pay + $amount;
                 }
 
-                if($total_amount_pay != $data['total_amount']){
-                    return ['status'=>false,'message'=>"Total amount is not sum up with payment breakup"];
-                }
+               // if($total_amount_pay != $data['total_amount']){
+                 //   return ['status'=>false,'message'=>"Total amount is not sum up with payment breakup"];
+                //}
 
                 $client = new Client(['headers' => [ 'Content-Type' => 'application/json',"app-key"=>$this->app_key ]]);
                 $url = $this->base_url.'/payment';
