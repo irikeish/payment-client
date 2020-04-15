@@ -97,7 +97,7 @@ class PaymentClient
                     return ['status'=>false,'message'=>"Total amount is not sum up with payment breakup"];
                 }
 
-                $client = new Client(['headers' => [ 'Content-Type' => 'application/json',"app_key"=>$this->app_key ]]);
+                $client = new Client(['headers' => [ 'Content-Type' => 'application/json',"app-key"=>$this->app_key ]]);
                 $url = $this->base_url.'/paymentRetailerWallet';
 
                 $content = [
@@ -168,7 +168,7 @@ class PaymentClient
                     return ['status'=>false,'message'=>"Total amount is not sum up with payment breakup"];
                 }
 
-                $client = new Client(['headers' => [ 'Content-Type' => 'application/json',"app_key"=>$this->app_key ]]);
+                $client = new Client(['headers' => [ 'Content-Type' => 'application/json',"app-key"=>$this->app_key ]]);
                 $url = $this->base_url.'/payment';
 
                 $content = [
@@ -223,7 +223,7 @@ class PaymentClient
                 throw new \Exception("Invalid Request parameters");
             } else {
 
-                $client = new Client(['headers' => [ 'Content-Type' => 'application/json',"app_key"=>$this->app_key ]]);
+                $client = new Client(['headers' => [ 'Content-Type' => 'application/json',"app-key"=>$this->app_key ]]);
                 $url = $this->base_url.'/status';
 
                 $head = [];
@@ -286,7 +286,7 @@ class PaymentClient
                 throw new \Exception("Invalid Request parameters");
             } else {
 
-                $client = new Client(['headers' => [ 'Content-Type' => 'application/json',"app_key"=>$this->app_key ]]);
+                $client = new Client(['headers' => [ 'Content-Type' => 'application/json',"app-key"=>$this->app_key ]]);
                 $url = $this->base_url.'/validate';
 
                 $head = [];
@@ -350,7 +350,7 @@ class PaymentClient
             }
 
             $user_id = $data['user_id'];
-            $client = new Client(['headers' => [ 'Content-Type' => 'application/json',"app_key"=>$this->app_key ]]);
+            $client = new Client(['headers' => [ 'Content-Type' => 'application/json',"app-key"=>$this->app_key ]]);
             $url = $this->base_url.'/registerMachine';
             $head = [];
             $body = $data;
@@ -390,7 +390,7 @@ class PaymentClient
     public function getMachine(array $data = []) {
         try{
             $user_id = $data['user_id'];
-            $client = new Client(['headers' => [ 'Content-Type' => 'application/json',"app_key"=>$this->app_key ]]);
+            $client = new Client(['headers' => [ 'Content-Type' => 'application/json',"app-key"=>$this->app_key ]]);
             $url = $this->base_url.'/machine';
             $head = [];
             $body = $data;
@@ -432,7 +432,7 @@ class PaymentClient
             if (!$data['transaction_ids']) {
                 throw new \Exception("Invalid Request parameters");
             } else {
-                $client = new Client(['headers' => [ 'Content-Type' => 'application/json',"app_key"=>$this->app_key ]]);
+                $client = new Client(['headers' => [ 'Content-Type' => 'application/json',"app-key"=>$this->app_key ]]);
                 $url = $this->base_url.'/revert';
 
 
@@ -487,7 +487,7 @@ class PaymentClient
             if (!$data['transaction_ids']) {
                 throw new \Exception("Invalid Request parameters");
             } else {
-                $client = new Client(['headers' => [ 'Content-Type' => 'application/json',"app_key"=>$this->app_key ]]);
+                $client = new Client(['headers' => [ 'Content-Type' => 'application/json',"app-key"=>$this->app_key ]]);
                 $url = $this->base_url.'/revertStatus';
 
 
@@ -540,7 +540,7 @@ class PaymentClient
     public function addRetailerWallet(array $data = []) {
         try{
             $user_id = $data['user_id'];
-            $client = new Client(['headers' => [ 'Content-Type' => 'application/json',"app_key"=>$this->app_key ]]);
+            $client = new Client(['headers' => [ 'Content-Type' => 'application/json',"app-key"=>$this->app_key ]]);
             $url = $this->base_url.'/retailer';
             $head = [];
             $body = $data;
@@ -579,7 +579,7 @@ class PaymentClient
     public function addFarmerWallet(array $data = []) {
         try{
             $user_id = $data['user_id'];
-            $client = new Client(['headers' => [ 'Content-Type' => 'application/json',"app_key"=>$this->app_key ]]);
+            $client = new Client(['headers' => [ 'Content-Type' => 'application/json',"app-key"=>$this->app_key ]]);
             $url = $this->base_url.'/farmer';
             $head = [];
             $body = $data;
@@ -617,7 +617,7 @@ class PaymentClient
     public function addAkshamaalaWallet(array $data = []) {
         try{
             $user_id = $data['user_id'];
-            $client = new Client(['headers' => [ 'Content-Type' => 'application/json',"app_key"=>$this->app_key ]]);
+            $client = new Client(['headers' => [ 'Content-Type' => 'application/json',"app-key"=>$this->app_key ]]);
             $url = $this->base_url.'/akshamaala';
             $head = [];
             $body = $data;
@@ -655,7 +655,7 @@ class PaymentClient
 
     public function verifyOtp(array $data = []) {
         try{
-            $client = new Client(['headers' => [ 'Content-Type' => 'application/json',"app_key"=>$this->app_key ]]);
+            $client = new Client(['headers' => [ 'Content-Type' => 'application/json',"app-key"=>$this->app_key ]]);
             $url = $this->base_url.'/verifyOtp';
             $head = [];
             $body = $data;
@@ -705,7 +705,7 @@ class PaymentClient
 
     public function verifyOtpOrder(array $data = []) {
         try{
-            $client = new Client(['headers' => [ 'Content-Type' => 'application/json',"app_key"=>$this->app_key ]]);
+            $client = new Client(['headers' => [ 'Content-Type' => 'application/json',"app-key"=>$this->app_key ]]);
             $url = $this->base_url.'/verifyOtp';
             $head = [];
             $body = $data;
@@ -755,7 +755,7 @@ class PaymentClient
 
     public function getBalanceRetailer(array $data = []) {
         try{
-            $client = new Client(['headers' => [ 'Content-Type' => 'application/json',"app_key"=>$this->app_key ]]);
+            $client = new Client(['headers' => [ 'Content-Type' => 'application/json',"app-key"=>$this->app_key ]]);
             $url = $this->base_url.'/walletBalance/retailer';
             $head = [];
             $body = $data;
@@ -792,7 +792,7 @@ class PaymentClient
 
     public function getBalanceFarmer(array $data = []) {
         try{
-            $client = new Client(['headers' => [ 'Content-Type' => 'application/json',"app_key"=>$this->app_key ]]);
+            $client = new Client(['headers' => [ 'Content-Type' => 'application/json',"app-key"=>$this->app_key ]]);
             $url = $this->base_url.'/walletBalance/farmer';
             $head = [];
             $body = $data;
@@ -830,7 +830,7 @@ class PaymentClient
 
     public function getBalanceAkshamaala(array $data = []) {
         try{
-            $client = new Client(['headers' => [ 'Content-Type' => 'application/json',"app_key"=>$this->app_key ]]);
+            $client = new Client(['headers' => [ 'Content-Type' => 'application/json',"app-key"=>$this->app_key ]]);
             $url = $this->base_url.'/walletBalance/akshamaala';
             $head = [];
             $body = $data;
