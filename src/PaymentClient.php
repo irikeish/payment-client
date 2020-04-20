@@ -584,7 +584,7 @@ class PaymentClient
         try{
             $user_id = $data['user_id'];
             $client = new Client();
-            $url = $this->base_url.'/farmer';
+            $url = $this->base_url.'/farmers';
             $client->setDefaultOption('headers', [ 'Content-Type' => 'application/json','app-key'=>$this->app_key ]);
             $head = [];
             $body = $data;
@@ -766,7 +766,7 @@ class PaymentClient
             // var_dump($this->app_key);
             // die();
             $client = new Client();
-            $url = $this->base_url.'/walletBalance/retailer';
+            $url = $this->base_url.'/walletBalance/retailers';
             $client->setDefaultOption('headers', [ 'Content-Type' => 'application/json','app-key'=>$this->app_key ]);
             $head = [];
             $body = $data;
