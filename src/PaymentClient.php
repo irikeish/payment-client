@@ -544,7 +544,7 @@ class PaymentClient
         try{
             $user_id = $data['user_id'];
             $client = new Client();
-            $url = $this->base_url.'/retailer';
+            $url = $this->base_url.'/retailers';
             $client->setDefaultOption('headers', [ 'Content-Type' => 'application/json','app-key'=>$this->app_key ]);
             $head = [];
             $body = $data;
@@ -563,7 +563,7 @@ class PaymentClient
             if($ex->hasResponse()){
                 $response_data = json_decode($ex->getResponse()->getBody()->getContents(),true);
                 $payload = $response_data['payload'];
-                return ['status'=>false,"message"=>$payload['message']];
+                return ['status'=>false,"message"=>$payload['message'],'code'=>$response_data['code'],'data'=>$payload['data']];
             }
             return ['status'=>false,'message'=>"some payment client connection error with no error response"];
         }catch (RequestException $ex){
@@ -603,7 +603,7 @@ class PaymentClient
             if($ex->hasResponse()){
                 $response_data = json_decode($ex->getResponse()->getBody()->getContents(),true);
                 $payload = $response_data['payload'];
-                return ['status'=>false,"message"=>$payload['message']];
+                return ['status'=>false,"message"=>$payload['message'],'code'=>$response_data['code'],'data'=>$payload['data']];
             }
             return ['status'=>false,'message'=>"some payment client connection error with no error response"];
         }catch (RequestException $ex){
@@ -766,7 +766,7 @@ class PaymentClient
             // var_dump($this->app_key);
             // die();
             $client = new Client();
-            $url = $this->base_url.'/walletBalance/retailers';
+            $url = $this->base_url.'/walletBalance/retailer';
             $client->setDefaultOption('headers', [ 'Content-Type' => 'application/json','app-key'=>$this->app_key ]);
             $head = [];
             $body = $data;
