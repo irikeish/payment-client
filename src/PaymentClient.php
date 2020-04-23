@@ -23,8 +23,8 @@ class PaymentClient
 
             $validation_error = [];
 
-            if(!isset($data['user_id'])){
-                array_push($validation_error,"user_id is required");
+            if(!isset($data['receiver_id'])){
+                array_push($validation_error,"receiver_id is required");
             }
             if(!isset($data['order_id'])){
                 array_push($validation_error,"order_id is required");
@@ -74,11 +74,10 @@ class PaymentClient
     }
     
 
-    public function doRequestRetailer(array $data=[]){
+    public function addMoneyToRetailerWallet(array $data=[]){
         try{
 
             $validation = $this->validatePaymentRequestData($data);
-
             if (!$validation['status']) {
                 return $validation;
             } else {
@@ -542,9 +541,8 @@ class PaymentClient
 
     public function addRetailerWallet(array $data = []) {
         try{
-            $user_id = $data['user_id'];
             $client = new Client();
-            $url = $this->base_url.'/retailer';
+            $url = $this->base_url.'/retailers';
             $client->setDefaultOption('headers', [ 'Content-Type' => 'application/json','app-key'=>$this->app_key ]);
             $head = [];
             $body = $data;
@@ -563,7 +561,7 @@ class PaymentClient
             if($ex->hasResponse()){
                 $response_data = json_decode($ex->getResponse()->getBody()->getContents(),true);
                 $payload = $response_data['payload'];
-                return ['status'=>false,"message"=>$payload['message']];
+                return ['status'=>false,"message"=>$payload['message'],'code'=>$response_data['code'],'data'=>$payload['data']];
             }
             return ['status'=>false,'message'=>"some payment client connection error with no error response"];
         }catch (RequestException $ex){
@@ -582,9 +580,8 @@ class PaymentClient
 
     public function addFarmerWallet(array $data = []) {
         try{
-            $user_id = $data['user_id'];
             $client = new Client();
-            $url = $this->base_url.'/farmer';
+            $url = $this->base_url.'/farmers';
             $client->setDefaultOption('headers', [ 'Content-Type' => 'application/json','app-key'=>$this->app_key ]);
             $head = [];
             $body = $data;
@@ -603,7 +600,7 @@ class PaymentClient
             if($ex->hasResponse()){
                 $response_data = json_decode($ex->getResponse()->getBody()->getContents(),true);
                 $payload = $response_data['payload'];
-                return ['status'=>false,"message"=>$payload['message']];
+                return ['status'=>false,"message"=>$payload['message'],'code'=>$response_data['code'],'data'=>$payload['data']];
             }
             return ['status'=>false,'message'=>"some payment client connection error with no error response"];
         }catch (RequestException $ex){
@@ -621,7 +618,6 @@ class PaymentClient
 
     public function addAkshamaalaWallet(array $data = []) {
         try{
-            $user_id = $data['user_id'];
             $client = new Client();
             $url = $this->base_url.'/akshamaala';
             $client->setDefaultOption('headers', [ 'Content-Type' => 'application/json','app-key'=>$this->app_key ]);
