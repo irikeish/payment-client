@@ -130,7 +130,7 @@ class PaymentClient
                 $payload = $response_data['payload'];
                 return ['status'=>false,"message"=>$payload['message']];
             }
-            return ['status'=>false,'message'=>"some payment service connection error with no error response"];
+            return ['status'=>false,'message'=>"some payment client connection error with no error response"];
         }catch (RequestException $ex){
             if($ex->hasResponse()){
                 $response_data = json_decode($ex->getResponse()->getBody()->getContents(),true);
@@ -140,10 +140,75 @@ class PaymentClient
             return ['status'=>false,'message'=>"some payment service connection error with no error response"];
         }
         catch (\Exception $ex){
-            return ["status"=>false,"message"=>"some client error, contact to developer",'ex'=>$ex];
+            return ["status"=>false,"message"=>$ex->getMessage(),'ex'=>$ex];
         }
     }
 
+    public function addMoneyToFarmerWallet(array $data=[]){
+        try{
+
+            $validation = $this->validatePaymentRequestData($data);
+
+            if (!$validation['status']) {
+                return $validation;
+            } else {
+
+                $payment_breakup = $data['payment_breakup'];
+
+                $total_amount_pay = 0;
+
+                foreach ($payment_breakup as $payment_data){
+                    $payment_by = $payment_data['type'];
+                    $amount = $payment_data['amount'];
+                    $total_amount_pay = $total_amount_pay + $amount;
+                }
+
+                $client = new Client();
+                $url = $this->base_url.'/payment';
+                $client->setDefaultOption('headers', [ 'Content-Type' => 'application/json','app-key'=>$this->app_key ]);
+                $content = [
+                    'json' => $data
+                ];
+                $res = $client->post($url, $content);
+                $response_data = json_decode($res->getBody()->getContents(),true);
+                $payload = $response_data['payload'];
+                $payload_data = $payload['data'];
+                $message = $payload['message'];
+                $messageStatus = '';
+                $statusResult='';
+                foreach( $payload_data['transaction_status'] as $type ) {
+                    $statusResult=strtoupper($type['status']);
+                    if ( $type['status'] == 'failed' || $type['status'] == 'pending') {
+
+                        $messageStatus = $type['payment_method'].' payment '.$type['status'];
+                        $statusResult=strtoupper($type['status']);
+                        break;
+
+                    }
+                }
+                $transaction_status=['resultStatus'=>$statusResult,'message'=>$messageStatus,'status_response'=>$payload_data['transaction_status']];
+                return ['status'=>$response_data['status'],'message'=>$message,'transaction_id'=>implode(':',$payload_data['transaction_id']),'transaction_type'=>implode(':',$payload_data['transaction_type']),'transaction_status'=>$transaction_status];
+            }
+
+        }catch (ClientException $ex){
+            if($ex->hasResponse()){
+                $response_data = json_decode($ex->getResponse()->getBody()->getContents(),true);
+                $payload = $response_data['payload'];
+                return ['status'=>false,"message"=>$payload['message']];
+            }
+            return ['status'=>false,'message'=>"some payment client connection error with no error response"];
+        }catch (RequestException $ex){
+            if($ex->hasResponse()){
+                $response_data = json_decode($ex->getResponse()->getBody()->getContents(),true);
+                $payload = $response_data['payload'];
+                return ['status'=>false,"message"=>$payload['message']];
+            }
+            return ['status'=>false,'message'=>"some payment service connection error with no error response"];
+        }
+        catch (\Exception $ex){
+            return ["status"=>false,"message"=>$ex->getMessage(),'ex'=>$ex];
+        }
+    }
 
     public function doRequest(array $data=[]){
         try{
@@ -199,14 +264,14 @@ class PaymentClient
             if($ex->hasResponse()){
                 $response_data = json_decode($ex->getResponse()->getBody()->getContents(),true);
                 $payload = $response_data['payload'];
-                return ['status'=>false,"message"=>$payload['message']];
+                return ['status'=>false,"message"=>$payload['message'],'code'=>$response_data['code']];
             }
             return ['status'=>false,'message'=>"some payment service connection error with no error response"];
         }catch (RequestException $ex){
             if($ex->hasResponse()){
                 $response_data = json_decode($ex->getResponse()->getBody()->getContents(),true);
                 $payload = $response_data['payload'];
-                return ['status'=>false,"message"=>$payload['message']];
+                return ['status'=>false,"message"=>$payload['message'],'code'=>$response_data['code']];
             }
             return ['status'=>false,'message'=>"some payment service connection error with no error response"];
         }
