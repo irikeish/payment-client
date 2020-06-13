@@ -1388,4 +1388,45 @@ class PaymentClient
         }
     }
 
+    
+    public function addUserAndBeneficiary(array $data = []) {
+
+        try{
+            $client = new Client();
+            $url = $this->base_url.'/bankaccount/addUserAndBeneficiary';
+            $client->setDefaultOption('headers', [ 'Content-Type' => 'application/json','app-key'=>$this->app_key ]);
+            $head = [];
+            $body = $data;
+            $content = [
+                'json' => ($data)
+            ];
+            $res = $client->post($url, $content);
+
+            $response_str = $res->getBody()->getContents();
+            $response_data = json_decode($response_str,true);
+            $payload = $response_data['payload'];
+            $payload_data = $payload['data'];
+            $message = $payload['message'];
+            return ['code'=>$response_data['code'],'status'=>$response_data['status'],'message'=>$message,'data'=>$payload_data];
+
+        }catch (ClientException $ex){
+            if($ex->hasResponse()){
+                $response_data = json_decode($ex->getResponse()->getBody()->getContents(),true);
+                $payload = $response_data['payload'];
+                return ['status'=>false,"message"=>$payload['message']];
+            }
+            return ['status'=>false,'message'=>"some payment client connection error with no error response"];
+        }catch (RequestException $ex){
+            if($ex->hasResponse()){
+                $response_data = json_decode($ex->getResponse()->getBody()->getContents(),true);
+                $payload = $response_data['payload'];
+                return ['status'=>false,"message"=>$payload['message']];
+            }
+            return ['status'=>false,'message'=>"some payment service connection error with no error response"];
+        }
+        catch (\Exception $ex){
+            return ["status"=>false,"message"=>"some client error, contact to developer",'ex'=>$ex];
+        }
+    }
+
 }
