@@ -13,6 +13,15 @@ class PaymentClient
     private $base_url;
     private $app_key;
     const AKSHAMAALA_USER_ID = 'AKSHAMAALA:u132n231nti';
+    const USER_TYPE_RETAILER='RETAILER';
+    const USER_TYPE_FARMER='FARMER';
+    const USER_TYPE_PRODUCT_SUPPLIER='PRODUCT_SUPPLIER';
+    const USER_TYPE_OTHER_SUPPLIER='OTHER_SUPPLIER';
+    const ORDER_TYPE_RETAILER_ORDER='RETAILER_ORDER';
+    const ORDER_TYPE_AKSHAMAALA_ORDER='AKSHAMAALA_ORDER';
+    const ORDER_TYPE_WALLET_TOPUP='WALLET_TOPUP';
+    const USER_TYPE_SUPPLIER='SUPPLIER';
+
 
     public function __construct($base_url="http://payment/api",$key="uwtqeijugsajdgw564e6e5tfhsaluwqiwqha"){
         $this->base_url = $base_url;
