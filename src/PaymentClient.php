@@ -13,7 +13,6 @@ class PaymentClient
     private $base_url;
     private $app_key;
     const AKSHAMAALA_USER_ID = 'AKSHAMAALA:u132n231nti';
-<<<<<<< HEAD
     const USER_TYPE_RETAILER='RETAILER';
     const USER_TYPE_FARMER='FARMER';
     const USER_TYPE_PRODUCT_SUPPLIER='PRODUCT_SUPPLIER';
@@ -23,8 +22,6 @@ class PaymentClient
     const ORDER_TYPE_WALLET_TOPUP='WALLET_TOPUP';
     const USER_TYPE_SUPPLIER='SUPPLIER';
 
-=======
->>>>>>> 3ee8251abe7c6c354d6692bc124e9e69c63e537c
 
     public function __construct($base_url="http://payment/api",$key="uwtqeijugsajdgw564e6e5tfhsaluwqiwqha"){
         $this->base_url = $base_url;
@@ -62,15 +59,9 @@ class PaymentClient
             if(sizeof($validation_error)>0){
                 return ["status"=>false,"message"=>$validation_error];
             }
-<<<<<<< HEAD
 
             return ['status'=>true];
 
-=======
-
-            return ['status'=>true];
-
->>>>>>> 3ee8251abe7c6c354d6692bc124e9e69c63e537c
         }catch (\Exception $ex){
             return ["status"=>false,"message"=>"validation exception, contact developer for support","ex"=>$ex];
         }
@@ -200,17 +191,10 @@ class PaymentClient
             return ["status"=>false,"message"=>$ex->getMessage(),'ex'=>$ex];
         }
     }
-<<<<<<< HEAD
 
     public function addMoneyToSupplierWallet(array $data=[]){
         try{
 
-=======
-
-    public function addMoneyToSupplierWallet(array $data=[]){
-        try{
-
->>>>>>> 3ee8251abe7c6c354d6692bc124e9e69c63e537c
             $validation = $this->validatePaymentRequestData($data);
             if (!$validation['status']) {
                 return $validation;
@@ -902,8 +886,6 @@ class PaymentClient
         try{
             $client = new Client();
             $url = $this->base_url.'/wallets/retailers';
-<<<<<<< HEAD
-=======
             $client->setDefaultOption('headers', [ 'Content-Type' => 'application/json','app-key'=>$this->app_key ]);
             $head = [];
             $content = [
@@ -941,48 +923,6 @@ class PaymentClient
         try{
             $client = new Client();
             $url = $this->base_url.'/wallets/suppliers';
->>>>>>> 3ee8251abe7c6c354d6692bc124e9e69c63e537c
-            $client->setDefaultOption('headers', [ 'Content-Type' => 'application/json','app-key'=>$this->app_key ]);
-            $head = [];
-            $content = [
-                'json' => ($data)
-            ];
-            $res = $client->post($url, $content);
-            $response_str = $res->getBody()->getContents();
-            $response_data = json_decode($response_str,true);
-            $payload = $response_data['payload'];
-            $payload_data=$payload['data'];
-            $message = $payload['message'];            
-            return ['code'=>$response_data['code'],'status'=>$response_data['status'],'message'=>$message,'data'=>$payload_data];
-
-        }catch (ClientException $ex){
-            if($ex->hasResponse()){
-                $response_data = json_decode($ex->getResponse()->getBody()->getContents(),true);
-                $payload = $response_data['payload'];
-                return ['status'=>false,"message"=>$payload['message'],'code'=>$response_data['code'],'data'=>$payload['data']];
-            }
-            return ['status'=>false,'message'=>"some payment client connection error with no error response"];
-        }catch (RequestException $ex){
-            if($ex->hasResponse()){
-                $response_data = json_decode($ex->getResponse()->getBody()->getContents(),true);
-                $payload = $response_data['payload'];
-                return ['status'=>false,"message"=>$payload['message']];
-            }
-            return ['status'=>false,'message'=>"some payment service connection error with no error response"];
-        }
-        catch (\Exception $ex){
-            return ["status"=>false,"message"=>"some client error, contact to developer",'ex'=>$ex];
-        }
-    }
-
-    public function addSupplierWallet(array $data = []) {
-        try{
-            $client = new Client();
-<<<<<<< HEAD
-            $url = $this->base_url.'/wallets/suppliers';
-=======
-            $url = $this->base_url.'/wallets/farmers';
->>>>>>> 3ee8251abe7c6c354d6692bc124e9e69c63e537c
             $client->setDefaultOption('headers', [ 'Content-Type' => 'application/json','app-key'=>$this->app_key ]);
             $head = [];
             $content = [
@@ -1163,8 +1103,6 @@ class PaymentClient
             // die();
             $client = new Client();
             $url = $this->base_url.'/wallets/retailers/'.$data['retailer_id'];
-<<<<<<< HEAD
-=======
             $client->setDefaultOption('headers', [ 'Content-Type' => 'application/json','app-key'=>$this->app_key ]);
             $head = [];
             $body = $data;
@@ -1239,164 +1177,6 @@ class PaymentClient
             // die();
             $client = new Client();
             $url = $this->base_url.'/wallets/suppliers/'.$data['supplier_id'];
->>>>>>> 3ee8251abe7c6c354d6692bc124e9e69c63e537c
-            $client->setDefaultOption('headers', [ 'Content-Type' => 'application/json','app-key'=>$this->app_key ]);
-            $head = [];
-            $body = $data;
-            $res = $client->get($url);
-            $response_str = $res->getBody()->getContents();
-            $response_data = json_decode($response_str,true);
-            $payload = $response_data['payload'];
-            $payload_data = $payload['data'];
-            $message = $payload['message'];
-            return ['status'=>$response_data['status'],'message'=>$message,'data'=>$payload_data];
-
-        }catch (ClientException $ex){
-            if($ex->hasResponse()){
-                $response_data = json_decode($ex->getResponse()->getBody()->getContents(),true);
-                $payload = $response_data['payload'];
-                return ['status'=>false,"message"=>$payload['message']];
-            }
-            return ['status'=>false,'message'=>"some payment client connection error with no error response"];
-        }catch (RequestException $ex){
-            if($ex->hasResponse()){
-                $response_data = json_decode($ex->getResponse()->getBody()->getContents(),true);
-                $payload = $response_data['payload'];
-                return ['status'=>false,"message"=>$payload['message']];
-            }
-            return ['status'=>false,'message'=>"some payment service connection error with no error response"];
-        }
-        catch (\Exception $ex){
-            return ["status"=>false,"message"=>"some client error, contact to developer",'ex'=>$ex];
-        }
-    }
-
-    public function getTransactionsRetailer(array $data = []) {
-        try{
-            // var_dump($this->app_key);
-            // die();
-            $client = new Client();
-<<<<<<< HEAD
-            $url = $this->base_url.'/wallets/retailers/'.$data['retailer_id'].'/transactions';
-=======
-            $url = $this->base_url.'/wallets/farmers/'.$data['farmer_id'];
-            $client->setDefaultOption('headers', [ 'Content-Type' => 'application/json','app-key'=>$this->app_key ]);
-            $res = $client->get($url);
-            $response_str = $res->getBody()->getContents();
-            $response_data = json_decode($response_str,true);
-            $payload = $response_data['payload'];
-            $payload_data = $payload['data'];
-            $message = $payload['message'];
-            return ['status'=>$response_data['status'],'message'=>$message,'data'=>$payload_data];
-
-        }catch (ClientException $ex){
-            if($ex->hasResponse()){
-                $response_data = json_decode($ex->getResponse()->getBody()->getContents(),true);
-                $payload = $response_data['payload'];
-                return ['status'=>false,"message"=>$payload['message']];
-            }
-            return ['status'=>false,'message'=>"some payment client connection error with no error response"];
-        }catch (RequestException $ex){
-            if($ex->hasResponse()){
-                $response_data = json_decode($ex->getResponse()->getBody()->getContents(),true);
-                $payload = $response_data['payload'];
-                return ['status'=>false,"message"=>$payload['message']];
-            }
-            return ['status'=>false,'message'=>"some payment service connection error with no error response"];
-        }
-        catch (\Exception $ex){
-            return ["status"=>false,"message"=>"some client error, contact to developer",'ex'=>$ex];
-        }
-    }
-
-    public function getTransactionsFarmer(array $data = []) {
-        try{
-            $client = new Client();
-            $url = $this->base_url.'/wallets/farmers/'.$data['farmer_id'].'/transactions';
-            $client->setDefaultOption('headers', [ 'Content-Type' => 'application/json','app-key'=>$this->app_key ]);
-
-            $res = $client->get($url);
-            $response_str = $res->getBody()->getContents();
-            $response_data = json_decode($response_str,true);
-            $payload = $response_data['payload'];
-            $payload_data = $payload['data'];
-            $message = $payload['message'];
-            return ['status'=>$response_data['status'],'message'=>$message,'data'=>$payload_data];
-
-        }catch (ClientException $ex){
-            if($ex->hasResponse()){
-                $response_data = json_decode($ex->getResponse()->getBody()->getContents(),true);
-                $payload = $response_data['payload'];
-                return ['status'=>false,"message"=>$payload['message']];
-            }
-            return ['status'=>false,'message'=>"some payment client connection error with no error response"];
-        }catch (RequestException $ex){
-            if($ex->hasResponse()){
-                $response_data = json_decode($ex->getResponse()->getBody()->getContents(),true);
-                $payload = $response_data['payload'];
-                return ['status'=>false,"message"=>$payload['message']];
-            }
-            return ['status'=>false,'message'=>"some payment service connection error with no error response"];
-        }
-        catch (\Exception $ex){
-            return ["status"=>false,"message"=>"some client error, contact to developer",'ex'=>$ex];
-        }
-    }
-    
-
-    public function getBalanceAkshamaala(array $data = []) {
-        try{
-            $client = new Client();
-            $url = $this->base_url.'/walletBalance/akshamaala';
->>>>>>> 3ee8251abe7c6c354d6692bc124e9e69c63e537c
-            $client->setDefaultOption('headers', [ 'Content-Type' => 'application/json','app-key'=>$this->app_key ]);
-            $head = [];
-            $body = $data;
-            $res = $client->get($url);
-            $response_str = $res->getBody()->getContents();
-            $response_data = json_decode($response_str,true);
-            $payload = $response_data['payload'];
-            $payload_data = $payload['data'];
-            $message = $payload['message'];
-            return ['status'=>$response_data['status'],'message'=>$message,'data'=>$payload_data];
-
-        }catch (ClientException $ex){
-            if($ex->hasResponse()){
-                $response_data = json_decode($ex->getResponse()->getBody()->getContents(),true);
-                $payload = $response_data['payload'];
-                return ['status'=>false,"message"=>$payload['message']];
-            }
-            return ['status'=>false,'message'=>"some payment client connection error with no error response"];
-        }catch (RequestException $ex){
-            if($ex->hasResponse()){
-                $response_data = json_decode($ex->getResponse()->getBody()->getContents(),true);
-                $payload = $response_data['payload'];
-                return ['status'=>false,"message"=>$payload['message']];
-            }
-            return ['status'=>false,'message'=>"some payment service connection error with no error response"];
-        }
-        catch (\Exception $ex){
-            return ["status"=>false,"message"=>"some client error, contact to developer",'ex'=>$ex];
-        }
-    }
-<<<<<<< HEAD
-
-    public function getBalanceSupplier(array $data = []) {
-=======
-
-    
-    public function addUserAndBeneficiary(array $data = []) {
-
->>>>>>> 3ee8251abe7c6c354d6692bc124e9e69c63e537c
-        try{
-            // var_dump($this->app_key);
-            // die();
-            $client = new Client();
-<<<<<<< HEAD
-            $url = $this->base_url.'/wallets/suppliers/'.$data['supplier_id'];
-=======
-            $url = $this->base_url.'/bankaccount/addUserAndBeneficiary';
->>>>>>> 3ee8251abe7c6c354d6692bc124e9e69c63e537c
             $client->setDefaultOption('headers', [ 'Content-Type' => 'application/json','app-key'=>$this->app_key ]);
             $head = [];
             $body = $data;
