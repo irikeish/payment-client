@@ -21,6 +21,9 @@ class PaymentClient
     const ORDER_TYPE_AKSHAMAALA_ORDER='AKSHAMAALA_ORDER';
     const ORDER_TYPE_WALLET_TOPUP='WALLET_TOPUP';
     const USER_TYPE_SUPPLIER='SUPPLIER';
+    const FUND_TRANSFER_TYPE_ADVANCE_PAYMENT='ADVANCE_PAYMENT';
+    const FUND_TRANSFER_TYPE_ADJUST_PAYMENT='ADJUST_PAYMENT';
+    const FUND_TRANSFER_TYPE_FINAL_PAYMENT='FINAL_PAYMENT';
 
 
     public function __construct($base_url="http://payment/api",$key="uwtqeijugsajdgw564e6e5tfhsaluwqiwqha"){
@@ -995,10 +998,10 @@ class PaymentClient
         }
     }
 
-    public function verifyOtp(array $data = []) {
+    public function verifyOtpInputWallet(array $data = []) {
         try{
             $client = new Client();
-            $url = $this->base_url.'/verifyOtp';
+            $url = $this->base_url.'/input-wallet/verify-otp';
             $client->setDefaultOption('headers', [ 'Content-Type' => 'application/json','app-key'=>$this->app_key ]);
             $head = [];
             $body = $data;
@@ -1046,10 +1049,112 @@ class PaymentClient
         }
     }
 
-    public function verifyOtpOrder(array $data = []) {
+    public function verifyOtpChottaCredit(array $data = []) {
         try{
             $client = new Client();
-            $url = $this->base_url.'/verifyOtp';
+            $url = $this->base_url.'/chotta-credit/verify-otp';
+            $client->setDefaultOption('headers', [ 'Content-Type' => 'application/json','app-key'=>$this->app_key ]);
+            $head = [];
+            $body = $data;
+            $content = [
+                'json' => ($data)
+            ];
+            $res = $client->post($url, $content);
+            $response_str = $res->getBody()->getContents();
+            $response_data = json_decode($response_str,true);
+            $payload = $response_data['payload'];
+            $payload_data = $payload['data'];
+            $message = $response_data['payload']['message'];
+
+            $messageStatus = '';
+            $statusResult='';
+            foreach( $payload_data['transaction_status'] as $type ) {
+                $statusResult=strtoupper($type['status']);
+                if ( $type['status'] == 'failed' || $type['status'] == 'pending') {
+
+                    $messageStatus = $type['payment_method'].' payment '.$type['status'];
+                    $statusResult=strtoupper($type['status']);
+                    break;
+
+                }
+            }
+            $transaction_status=['resultStatus'=>$statusResult,'message'=>$messageStatus,'status_response'=>$payload_data['transaction_status']];
+            return ['status'=>$response_data['status'],'message'=>$message,'transaction_id'=>implode(':',$payload_data['transaction_id']),'transaction_type'=>implode(':',$payload_data['transaction_type']),'transaction_status'=>$transaction_status,'wallet_balance'=>$payload_data['wallet_balance']];        
+        }catch (ClientException $ex){
+            if($ex->hasResponse()){
+                $response_data = json_decode($ex->getResponse()->getBody()->getContents(),true);
+                $payload = $response_data['payload'];
+                return ['status'=>false,"message"=>$payload['message']];
+            }
+            return ['status'=>false,'message'=>"some payment client connection error with no error response"];
+        }catch (RequestException $ex){
+            if($ex->hasResponse()){
+                $response_data = json_decode($ex->getResponse()->getBody()->getContents(),true);
+                $payload = $response_data['payload'];
+                return ['status'=>false,"message"=>$payload['message']];
+            }
+            return ['status'=>false,'message'=>"some payment service connection error with no error response"];
+        }
+        catch (\Exception $ex){
+            return ["status"=>false,"message"=>"some client error, contact to developer",'ex'=>$ex];
+        }
+    }
+
+    public function resendOtpInputWallet(array $data = []) {
+        try{
+            $client = new Client();
+            $url = $this->base_url.'/input-wallet/resend-otp';
+            $client->setDefaultOption('headers', [ 'Content-Type' => 'application/json','app-key'=>$this->app_key ]);
+            $head = [];
+            $body = $data;
+            $content = [
+                'json' => ($data)
+            ];
+            $res = $client->post($url, $content);
+            $response_str = $res->getBody()->getContents();
+            $response_data = json_decode($response_str,true);
+            $payload = $response_data['payload'];
+            $payload_data = $payload['data'];
+            $message = $response_data['payload']['message'];
+
+            $messageStatus = '';
+            $statusResult='';
+            foreach( $payload_data['transaction_status'] as $type ) {
+                $statusResult=strtoupper($type['status']);
+                if ( $type['status'] == 'failed' || $type['status'] == 'pending') {
+
+                    $messageStatus = $type['payment_method'].' payment '.$type['status'];
+                    $statusResult=strtoupper($type['status']);
+                    break;
+
+                }
+            }
+            $transaction_status=['resultStatus'=>$statusResult,'message'=>$messageStatus,'status_response'=>$payload_data['transaction_status']];
+            return ['status'=>$response_data['status'],'message'=>$message,'transaction_id'=>implode(':',$payload_data['transaction_id']),'transaction_type'=>implode(':',$payload_data['transaction_type']),'transaction_status'=>$transaction_status];        
+        }catch (ClientException $ex){
+            if($ex->hasResponse()){
+                $response_data = json_decode($ex->getResponse()->getBody()->getContents(),true);
+                $payload = $response_data['payload'];
+                return ['status'=>false,"message"=>$payload['message']];
+            }
+            return ['status'=>false,'message'=>"some payment client connection error with no error response"];
+        }catch (RequestException $ex){
+            if($ex->hasResponse()){
+                $response_data = json_decode($ex->getResponse()->getBody()->getContents(),true);
+                $payload = $response_data['payload'];
+                return ['status'=>false,"message"=>$payload['message']];
+            }
+            return ['status'=>false,'message'=>"some payment service connection error with no error response"];
+        }
+        catch (\Exception $ex){
+            return ["status"=>false,"message"=>"some client error, contact to developer",'ex'=>$ex];
+        }
+    }
+
+    public function resendOtpChottaCredit(array $data = []) {
+        try{
+            $client = new Client();
+            $url = $this->base_url.'/chotta-credit/resend-otp';
             $client->setDefaultOption('headers', [ 'Content-Type' => 'application/json','app-key'=>$this->app_key ]);
             $head = [];
             $body = $data;
@@ -1185,6 +1290,86 @@ class PaymentClient
             ];
             $res = $client->post($url, $content);
 
+            $response_str = $res->getBody()->getContents();
+            $response_data = json_decode($response_str,true);
+            $payload = $response_data['payload'];
+            $payload_data = $payload['data'];
+            $message = $payload['message'];
+            return ['code'=>$response_data['code'],'status'=>$response_data['status'],'message'=>$message,'data'=>$payload_data];
+
+        }catch (ClientException $ex){
+            if($ex->hasResponse()){
+                $response_data = json_decode($ex->getResponse()->getBody()->getContents(),true);
+                $payload = $response_data['payload'];
+                return ['status'=>false,"message"=>$payload['message']];
+            }
+            return ['status'=>false,'message'=>"some payment client connection error with no error response"];
+        }catch (RequestException $ex){
+            if($ex->hasResponse()){
+                $response_data = json_decode($ex->getResponse()->getBody()->getContents(),true);
+                $payload = $response_data['payload'];
+                return ['status'=>false,"message"=>$payload['message']];
+            }
+            return ['status'=>false,'message'=>"some payment service connection error with no error response"];
+        }
+        catch (\Exception $ex){
+            return ["status"=>false,"message"=>"some client error, contact to developer",'ex'=>$ex];
+        }
+    }
+
+    public function getMainAccountBalanceSupplier(array $data = []) {
+        try{
+            // var_dump($this->app_key);
+            // die();
+            $client = new Client();
+            $url = $this->base_url.'/wallets/suppliers/main-account/'.$data['supplier_id'];
+            $client->setDefaultOption('headers', [ 'Content-Type' => 'application/json','app-key'=>$this->app_key ]);
+            $head = [];
+            $body = $data;
+            $content = [
+                'json' => ($data)
+            ];
+            $res = $client->get($url, $content);
+            $response_str = $res->getBody()->getContents();
+            $response_data = json_decode($response_str,true);
+            $payload = $response_data['payload'];
+            $payload_data = $payload['data'];
+            $message = $payload['message'];
+            return ['code'=>$response_data['code'],'status'=>$response_data['status'],'message'=>$message,'data'=>$payload_data];
+
+        }catch (ClientException $ex){
+            if($ex->hasResponse()){
+                $response_data = json_decode($ex->getResponse()->getBody()->getContents(),true);
+                $payload = $response_data['payload'];
+                return ['status'=>false,"message"=>$payload['message']];
+            }
+            return ['status'=>false,'message'=>"some payment client connection error with no error response"];
+        }catch (RequestException $ex){
+            if($ex->hasResponse()){
+                $response_data = json_decode($ex->getResponse()->getBody()->getContents(),true);
+                $payload = $response_data['payload'];
+                return ['status'=>false,"message"=>$payload['message']];
+            }
+            return ['status'=>false,'message'=>"some payment service connection error with no error response"];
+        }
+        catch (\Exception $ex){
+            return ["status"=>false,"message"=>"some client error, contact to developer",'ex'=>$ex];
+        }
+    }
+
+    public function getSupplierFundTransferByOrderId(array $data = []) {
+        try{
+            // var_dump($this->app_key);
+            // die();
+            $client = new Client();
+            $url = $this->base_url.'/suppliers/'.$data['supplier_id'].'/fund-transfer-history/'.$data['order_id'];
+            $client->setDefaultOption('headers', [ 'Content-Type' => 'application/json','app-key'=>$this->app_key ]);
+            $head = [];
+            $body = $data;
+            $content = [
+                'json' => ($data)
+            ];
+            $res = $client->get($url, $content);
             $response_str = $res->getBody()->getContents();
             $response_data = json_decode($response_str,true);
             $payload = $response_data['payload'];
