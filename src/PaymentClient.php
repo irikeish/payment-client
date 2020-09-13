@@ -1405,7 +1405,7 @@ class PaymentClient
             $content = [
                 'json' => $data
             ];
-            $res = $client->get($url,$content);
+            $res = $client->post($url,$content);
             $response_str = $res->getBody()->getContents();
             $response_data = json_decode($response_str,true);
             $payload = $response_data['payload'];
