@@ -1400,9 +1400,12 @@ class PaymentClient
     public function getBalanceFarmer(array $data = []) {
         try{
             $client = new Client();
-            $url = $this->base_url.'/wallets/farmers/'.$data['farmer_id'];
+            $url = $this->base_url.'/wallets/farmers';
             $client->setDefaultOption('headers', [ 'Content-Type' => 'application/json','app-key'=>$this->app_key ]);
-            $res = $client->get($url);
+            $content = [
+                'json' => $data
+            ];
+            $res = $client->post($url,$content);
             $response_str = $res->getBody()->getContents();
             $response_data = json_decode($response_str,true);
             $payload = $response_data['payload'];
