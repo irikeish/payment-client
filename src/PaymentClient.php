@@ -30,6 +30,7 @@ class PaymentClient
         $this->base_url = $base_url;
         $this->app_key = $key;
     }
+    
     private function validateFundTransferRequest(array $data=[]){
         try{
 
@@ -69,6 +70,7 @@ class PaymentClient
             return ["status"=>false,"message"=>"validation exception, contact developer for support","ex"=>$ex];
         }
     }
+
     private function validatePaymentRequestData(array $data=[]){
         try{
 
@@ -123,7 +125,82 @@ class PaymentClient
             return ["status"=>false,"message"=>"validation exception, contact developer for support","ex"=>$ex];
         }
     }
-    
+
+    private function validateGetBeneficiariesData(array $data=[]){
+        try{
+
+            $validation_error = [];
+
+            if(!isset($data['user_type'])){
+                array_push($validation_error,"user_type is required");
+            }
+            if(!isset($data['user_id'])){
+                array_push($validation_error,"user_id is required");
+            }
+            if(sizeof($validation_error)>0){
+                return ["status"=>false,"message"=>$validation_error];
+            }
+
+            return ['status'=>true];
+
+        }catch (\Exception $ex){
+            return ["status"=>false,"message"=>"validation exception, contact developer for support","ex"=>$ex];
+        }
+    }
+
+    private function validateBeneficiariesData(array $data=[]){
+        try{
+
+            $validation_error = [];
+
+            if(!isset($data['user_type'])){
+                array_push($validation_error,"user_type is required");
+            }
+            if(!isset($data['user_id'])){
+                array_push($validation_error,"user_id is required");
+            }
+            if(!isset($data['phone_number'])){
+                array_push($validation_error,"phone_number is required");
+            }
+            if(!isset($data['account_number'])){
+                array_push($validation_error,"account_number is required");
+            }
+            if(!isset($data['ifsc'])){
+                array_push($validation_error,"ifsc is required");
+            }
+            if(!isset($data['name'])){
+                array_push($validation_error,"name is required");
+            }
+            if(sizeof($validation_error)>0){
+                return ["status"=>false,"message"=>$validation_error];
+            }
+
+            return ['status'=>true];
+
+        }catch (\Exception $ex){
+            return ["status"=>false,"message"=>"validation exception, contact developer for support","ex"=>$ex];
+        }
+    }
+
+    private function validateDeleteBeneficiariesData(array $data=[]){
+        try{
+
+            $validation_error = [];
+
+            if(!isset($data['account_id'])){
+                array_push($validation_error,"account_id is required");
+            }
+        
+            if(sizeof($validation_error)>0){
+                return ["status"=>false,"message"=>$validation_error];
+            }
+
+            return ['status'=>true];
+
+        }catch (\Exception $ex){
+            return ["status"=>false,"message"=>"validation exception, contact developer for support","ex"=>$ex];
+        }
+    }
 
     public function addMoneyToRetailerWallet(array $data=[]){
         try{
@@ -1470,23 +1547,155 @@ class PaymentClient
     public function addUserAndBeneficiary(array $data = []) {
 
         try{
-            $client = new Client();
-            $url = $this->base_url.'/bankaccount/addUserAndBeneficiary';
-            $client->setDefaultOption('headers', [ 'Content-Type' => 'application/json','app-key'=>$this->app_key ]);
-            $head = [];
-            $body = $data;
-            $content = [
-                'json' => ($data)
-            ];
-            $res = $client->post($url, $content);
+            $validation = $this->validateBeneficiariesData($data);
+            if (!$validation['status']) {
+                return $validation;
+            } else {
+                $client = new Client();
+                $url = $this->base_url.'/beneficiaries';
+                $client->setDefaultOption('headers', [ 'Content-Type' => 'application/json','app-key'=>$this->app_key ]);
+                $head = [];
+                $body = $data;
+                $content = [
+                    'json' => ($data)
+                ];
+                $res = $client->post($url, $content);
 
-            $response_str = $res->getBody()->getContents();
-            $response_data = json_decode($response_str,true);
-            $payload = $response_data['payload'];
-            $payload_data = $payload['data'];
-            $message = $payload['message'];
-            return ['code'=>$response_data['code'],'status'=>$response_data['status'],'message'=>$message,'data'=>$payload_data];
+                $response_str = $res->getBody()->getContents();
+                $response_data = json_decode($response_str,true);
+                $payload = $response_data['payload'];
+                $payload_data = $payload['data'];
+                $message = $payload['message'];
+                return ['code'=>$response_data['code'],'status'=>$response_data['status'],'message'=>$message,'data'=>$payload_data];
+            }
+        }catch (ClientException $ex){
+            if($ex->hasResponse()){
+                $response_data = json_decode($ex->getResponse()->getBody()->getContents(),true);
+                $payload = $response_data['payload'];
+                return ['status'=>false,"message"=>$payload['message']];
+            }
+            return ['status'=>false,'message'=>"some payment client connection error with no error response"];
+        }catch (RequestException $ex){
+            if($ex->hasResponse()){
+                $response_data = json_decode($ex->getResponse()->getBody()->getContents(),true);
+                $payload = $response_data['payload'];
+                return ['status'=>false,"message"=>$payload['message']];
+            }
+            return ['status'=>false,'message'=>"some payment service connection error with no error response"];
+        }
+        catch (\Exception $ex){
+            return ["status"=>false,"message"=>"some client error, contact to developer",'ex'=>$ex];
+        }
+    }
 
+    public function getBeneficiary(array $data = []) {
+
+        try{
+            $validation = $this->validateGetBeneficiariesData($data);
+            if (!$validation['status']) {
+                return $validation;
+            } else {
+                $client = new Client();
+
+                $url = $this->base_url.'/beneficiaries/'.$data['user_type'].'/'.$data['user_id'];
+                $client->setDefaultOption('headers', [ 'Content-Type' => 'application/json','app-key'=>$this->app_key ]);
+                $res = $client->get($url);
+
+                $response_str = $res->getBody()->getContents();
+                $response_data = json_decode($response_str,true);
+                $payload = $response_data['payload'];
+                $payload_data = $payload['data'];
+                $message = $payload['message'];
+                return ['code'=>$response_data['code'],'status'=>$response_data['status'],'message'=>$message,'data'=>$payload_data];
+            }
+        }catch (ClientException $ex){
+            if($ex->hasResponse()){
+                $response_data = json_decode($ex->getResponse()->getBody()->getContents(),true);
+                $payload = $response_data['payload'];
+                return ['status'=>false,"message"=>$payload['message']];
+            }
+            return ['status'=>false,'message'=>"some payment client connection error with no error response"];
+        }catch (RequestException $ex){
+            if($ex->hasResponse()){
+                $response_data = json_decode($ex->getResponse()->getBody()->getContents(),true);
+                $payload = $response_data['payload'];
+                return ['status'=>false,"message"=>$payload['message']];
+            }
+            return ['status'=>false,'message'=>"some payment service connection error with no error response"];
+        }
+        catch (\Exception $ex){
+            return ["status"=>false,"message"=>"some client error, contact to developer",'ex'=>$ex];
+        }
+    }
+
+    public function deleteBeneficiary(array $data = []) {
+
+        try{
+            $validation = $this->validateDeleteBeneficiariesData($data);
+            if (!$validation['status']) {
+                return $validation;
+            } else {
+                $client = new Client();
+                $url = $this->base_url.'/beneficiaries';
+                $client->setDefaultOption('headers', [ 'Content-Type' => 'application/json','app-key'=>$this->app_key ]);
+                $head = [];
+                $body = $data;
+                $content = [
+                    'json' => ($data)
+                ];
+                $res = $client->delete($url, $content);
+
+                $response_str = $res->getBody()->getContents();
+                $response_data = json_decode($response_str,true);
+                $payload = $response_data['payload'];
+                $payload_data = $payload['data'];
+                $message = $payload['message'];
+                return ['code'=>$response_data['code'],'status'=>$response_data['status'],'message'=>$message,'data'=>$payload_data];
+            }
+        }catch (ClientException $ex){
+            if($ex->hasResponse()){
+                $response_data = json_decode($ex->getResponse()->getBody()->getContents(),true);
+                $payload = $response_data['payload'];
+                return ['status'=>false,"message"=>$payload['message']];
+            }
+            return ['status'=>false,'message'=>"some payment client connection error with no error response"];
+        }catch (RequestException $ex){
+            if($ex->hasResponse()){
+                $response_data = json_decode($ex->getResponse()->getBody()->getContents(),true);
+                $payload = $response_data['payload'];
+                return ['status'=>false,"message"=>$payload['message']];
+            }
+            return ['status'=>false,'message'=>"some payment service connection error with no error response"];
+        }
+        catch (\Exception $ex){
+            return ["status"=>false,"message"=>"some client error, contact to developer",'ex'=>$ex];
+        }
+    }
+
+    public function verifyBeneficiary(array $data = []) {
+
+        try{
+            $validation = $this->validateDeleteBeneficiariesData($data);
+            if (!$validation['status']) {
+                return $validation;
+            } else {
+                $client = new Client();
+                $url = $this->base_url.'/beneficiaries/verify';
+                $client->setDefaultOption('headers', [ 'Content-Type' => 'application/json','app-key'=>$this->app_key ]);
+                $head = [];
+                $body = $data;
+                $content = [
+                    'json' => ($data)
+                ];
+                $res = $client->post($url, $content);
+
+                $response_str = $res->getBody()->getContents();
+                $response_data = json_decode($response_str,true);
+                $payload = $response_data['payload'];
+                $payload_data = $payload['data'];
+                $message = $payload['message'];
+                return ['code'=>$response_data['code'],'status'=>$response_data['status'],'message'=>$message,'data'=>$payload_data];
+            }
         }catch (ClientException $ex){
             if($ex->hasResponse()){
                 $response_data = json_decode($ex->getResponse()->getBody()->getContents(),true);
