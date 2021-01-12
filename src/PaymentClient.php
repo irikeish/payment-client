@@ -71,6 +71,34 @@ class PaymentClient
         }
     }
 
+    private function validateAddMachine(array $data=[]){
+        try{
+
+            $validation_error = [];
+
+            if(!isset($data['user_id'])){
+                array_push($validation_error,"user id is required");
+            }
+            if(!isset($data['machine_type'])){
+                array_push($validation_error,"machine type is required");
+            }
+            if(isset($data['machine_type']) && !is_string($data['machine_type']) ){
+                array_push($validation_error,"machine type is of type string");
+            }
+            if(isset($data['machine_mid']) && !is_string($data['machine_mid']) ){
+                array_push($validation_error,"machine mid is of type string");
+            }
+            if(sizeof($validation_error)>0){
+                return ["status"=>false,"message"=>$validation_error];
+            }
+
+            return ['status'=>true];
+
+        }catch (\Exception $ex){
+            return ["status"=>false,"message"=>"validation exception, contact developer for support","ex"=>$ex];
+        }
+    }
+
     private function validatePaymentRequestData(array $data=[]){
         try{
 
@@ -845,8 +873,8 @@ class PaymentClient
 
     /**
      * @param array $data = {
-     *              driver_response : json,
-     *              transaction_id : string
+     *              driver_response : json|required,
+     *              transaction_id : string|required
      *              }
      * @return array [] = {
      *                  message : string
@@ -920,49 +948,75 @@ class PaymentClient
 
     /**
      * @param array $data = {
-     *              user_id : string,
-     *              machine_type : string
+     *              user_id : string|required,
+     *              machine_type : string|required|in:paytm,ezetap
+     *              machine_mid : string
      *              }
      * @return array [] = {
-     *                  message : string
-     *                  resultStatus: string,
-     *                  status_response : array = [{
-     *                                             payment_method : string,
-     *                                             status : string
-     *                                            }]
-     *              }
-     * @example { status: true, message: '', data:{ user_id : '1', machine_type: 'paytm', machine_tid: '323uaocan' } }
+     *                  code : integer
+     *                  status : boolean,
+     *                  message : string,
+     *                  data : json = {
+     *                             machines: array = [
+     *                                      {
+     *                                         mid: integer,
+     *                                         user_id: string,
+     *                                         name: string,
+     *                                         machine_type: string,
+     *                                         machine_mid: string,
+     *                                         date_added: string | format (d-m-Y)
+     *                                      }
+     *                             ],
+     *                         }
+     *                 }
+     * @example { 
+     *              code : 201 ,
+     *              status: true,
+     *              message: 'Machine registered for user.',
+     *              data:{  
+     *                      machines: [
+     *                          { 
+     *                              "mid": 21,
+     *                              "user_id": "34423", 
+     *                              "name": "N/A (34423)", 
+     *                              "machine_type": "paytm", 
+     *                              "machine_mid": "12132312", 
+     *                              "date_added": "12-01-2021"
+     *                          }
+     *                      ]
+     *             }
+     *          }
      */
-    public function registerMachine(array $data =[]) {
+    public function addMachine(array $data =[]) {
 
         try{
-
-            if (!isset($data['user_id'])) {
-                throw new \Exception("User id is required.");
+            $validation = $this->validateAddMachine($data);
+            if (!$validation['status']) {
+                return $validation;
+            }else{
+                $client = new Client();
+                $url = $this->base_url.'/machines';
+                $client->setDefaultOption('headers', [ 'Content-Type' => 'application/json','app-key'=>$this->app_key ]);
+                $head = [];
+                $body = [
+                    'machine_type'=>$data['machine_type'],
+                    'user_id'=>$data['user_id']
+                ];
+                if(isset($data['machine_mid'])){
+                    $body['machine_mid']=$data['machine_mid'];
+                }
+                $content = [
+                    'json' => ($body)
+                ];
+                $res = $client->post($url, $content);
+    
+                $response_str = $res->getBody()->getContents();
+                $response_data = json_decode($response_str,true);
+    
+                $payload = $response_data['payload'];
+                $message = $payload['message'];
+                return ['status'=>$response_data['status'],'message'=>$message,'data'=>$payload['data']];    
             }
-
-            if (!isset($data['machine_type'])) {
-                throw new \Exception("Machine type is required.");
-            }
-
-            $user_id = $data['user_id'];
-            $client = new Client();
-            $url = $this->base_url.'/registerMachine';
-            $client->setDefaultOption('headers', [ 'Content-Type' => 'application/json','app-key'=>$this->app_key ]);
-            $head = [];
-            $body = $data;
-            $content = [
-                'json' => ($data)
-            ];
-            $res = $client->post($url, $content);
-
-            $response_str = $res->getBody()->getContents();
-            $response_data = json_decode($response_str,true);
-
-            $payload = $response_data['payload'];
-            $message = $payload['message'];
-            return ['status'=>$response_data['status'],'message'=>$message,'data'=>$payload['data']];
-
         }catch (ClientException $ex){
             if($ex->hasResponse()){
                 $response_data = json_decode($ex->getResponse()->getBody()->getContents(),true);
@@ -987,30 +1041,65 @@ class PaymentClient
 
     /**
      * @param array $data = {
-     *              user_id : string
+     *              pageNum : integer,
+     *              pageSize : integer
      *              }
      * @return array [] = {
-     *                  message : string
-     *                  resultStatus: string,
-     *                  status_response : array = [{
-     *                                             payment_method : string,
-     *                                             status : string
-     *                                            }]
-     *              }
-     * @example { status: true, message: '', data:{  machine_type: 'paytm', machine_tid: '323uaocan' } }
+     *                  code : integer
+     *                  status : boolean,
+     *                  message : string,
+     *                  data : json = {
+     *                             machines: array = [
+     *                                     "machine_id":{
+     *                                         mid: integer,
+     *                                         user_id: string,
+     *                                         name: string,
+     *                                         machine_type: string,
+     *                                         machine_mid: string,
+     *                                         date: string | format (d-m-Y)
+     *                                      }
+     *                             ],
+     *                             machine_ids: array = [],
+     *                             pageNum: integer,
+     *                             pageSize: integer,
+     *                             totalCount: integer,
+     *                             totalPage: integer
+     *                         }
+     *                 }
+     * @example { 
+     *              code : 200 ,
+     *              status: true,
+     *              message: 'Machines fetched successfully.',
+     *              data:{  
+     *                      machines: {
+     *                          "21": { 
+     *                              "mid": 21,
+     *                              "user_id": "34423", 
+     *                              "name": "N/A (34423)", 
+     *                              "machine_type": "paytm", 
+     *                              "machine_mid": "12132312", 
+     *                              "date": "12-01-2021"
+     *                          }
+     *                      },
+     *                      machine_ids: [20],
+     *                      pageNum: 1, 
+     *                      pageSize: 10,
+     *                      totalCount: 1,
+     *                      totalPage: 1
+     *             }
+     *          }
      */
-    public function getMachine(array $data = []) {
+    public function getAllMachines(array $data = []) {
         try{
-            $user_id = $data['user_id'];
             $client = new Client();
-            $url = $this->base_url.'/machine';
+            $url = $this->base_url.'/machines';
             $client->setDefaultOption('headers', [ 'Content-Type' => 'application/json','app-key'=>$this->app_key ]);
             $head = [];
             $body = $data;
             $content = [
-                'json' => ($data)
+                'query' => ($data)
             ];
-            $res = $client->post($url, $content);
+            $res = $client->get($url,$content);
             $response_str = $res->getBody()->getContents();
             $response_data = json_decode($response_str,true);
             $payload = $response_data['payload'];
