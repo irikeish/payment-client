@@ -2280,9 +2280,7 @@ class PaymentClient
     /*** --- Get Supplier Wallet Transaction (Abhilash) **/
     public function getSupplierWalletTransactions(array $data = []) {
         try{
-            // var_dump($data);die();
-            // var_dump($this->app_key);
-            // die();
+
             $client = new Client();
             $url = $this->base_url.'/wallets/supplier/'.$data['supplier_id'].'/transactions';
             $client->setDefaultOption('headers', [ 'Content-Type' => 'application/json','app-key'=>$this->app_key ]);
