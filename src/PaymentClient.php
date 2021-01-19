@@ -2277,6 +2277,7 @@ class PaymentClient
             return ["status"=>false,"message"=>"some client error, contact to developer",'ex'=>$ex];
         }
     }
+    /*** --- Get Supplier Wallet Transaction (Abhilash) **/
     public function getSupplierWalletTransactions(array $data = []) {
         try{
             // var_dump($data);die();
