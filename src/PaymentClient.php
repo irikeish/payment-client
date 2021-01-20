@@ -2277,7 +2277,22 @@ class PaymentClient
             return ["status"=>false,"message"=>"some client error, contact to developer",'ex'=>$ex];
         }
     }
-    /*** --- Get Supplier Wallet Transaction (Abhilash) **/
+    /*** --- Get Supplier Wallet Transaction (Abhilash)
+     * @param array $data = {
+     *              account_id : string,
+     *              date_start : string,
+     *              date_end : string
+     *              }
+     * @return array [] = {
+     *                  code : integer,
+     *                  message : string
+     *                  status: boolean,
+     *                  data : array = []
+     *              }
+     * @example { code : 200, status: true, message: string, data:{} }
+     */
+
+     **/
     public function getSupplierWalletTransactions(array $data = []) {
         try{
 
