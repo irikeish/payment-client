@@ -2287,14 +2287,14 @@ class PaymentClient
      *                  code : integer,
      *                  message : string
      *                  status: boolean,
-     *                  data : array = [
+     *                  data : {
      *                        "wallet_id": int,
      *                        "type": string,
                               "amount": string,
                               "confirmed": boolean,
                               "meta": json,
                               "created_at": timestamp
-     *              ]
+     *              }
      *              }
      * @example { code : 200, status: true, message: "", data:{"wallet_id": 808, * "type": "withdraw", "amount": "-234000", "confirmed": 1, "meta": "{\"type\": \"FUND_TRANSFER\", * \"amount\": \"234000\", * \"order_id\": \"b2ad0ee6-7156-4eef-ad0e-565b49f04f1c\", * \"paid_to_id\": \"308\", * \"paid_to_type\": \"PRODUCT_SUPPLIER\", * \"total_amount\": \"234000\", * \"transaction_id\": \"5ff3fa7255915\"}", "uuid": "7ba68d1c-f6d9-4792-af3d-3d383d759c13", "created_at": "2021-01-05 07:00:59"} }
      */
