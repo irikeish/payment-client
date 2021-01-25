@@ -30,6 +30,7 @@ class PaymentClient
         $this->base_url = $base_url;
         $this->app_key = $key;
     }
+
     private function validateFundTransferRequest(array $data=[]){
         try{
 
@@ -69,6 +70,7 @@ class PaymentClient
             return ["status"=>false,"message"=>"validation exception, contact developer for support","ex"=>$ex];
         }
     }
+
     private function validatePaymentRequestData(array $data=[]){
         try{
 
@@ -123,7 +125,110 @@ class PaymentClient
             return ["status"=>false,"message"=>"validation exception, contact developer for support","ex"=>$ex];
         }
     }
-    
+
+    private function validateGetBeneficiariesData(array $data=[]){
+        try{
+
+            $validation_error = [];
+
+            if(!isset($data['user_type'])){
+                array_push($validation_error,"user_type is required");
+            }
+            if(!isset($data['user_id'])){
+                array_push($validation_error,"user_id is required");
+            }
+            if(sizeof($validation_error)>0){
+                return ["status"=>false,"message"=>$validation_error];
+            }
+
+            return ['status'=>true];
+
+        }catch (\Exception $ex){
+            return ["status"=>false,"message"=>"validation exception, contact developer for support","ex"=>$ex];
+        }
+    }
+
+    private function validateBeneficiariesData(array $data=[]){
+        try{
+
+            $validation_error = [];
+
+            if(!isset($data['user_type'])){
+                array_push($validation_error,"user_type is required");
+            }
+            if(!isset($data['user_id'])){
+                array_push($validation_error,"user_id is required");
+            }
+            if(!isset($data['phone_number'])){
+                array_push($validation_error,"phone_number is required");
+            }
+            if(!isset($data['account_number'])){
+                array_push($validation_error,"account_number is required");
+            }
+            if(!isset($data['ifsc'])){
+                array_push($validation_error,"ifsc is required");
+            }
+            if(!isset($data['name'])){
+                array_push($validation_error,"name is required");
+            }
+            if(sizeof($validation_error)>0){
+                return ["status"=>false,"message"=>$validation_error];
+            }
+
+            return ['status'=>true];
+
+        }catch (\Exception $ex){
+            return ["status"=>false,"message"=>"validation exception, contact developer for support","ex"=>$ex];
+        }
+    }
+
+    private function validateDeleteBeneficiariesData(array $data=[]){
+        try{
+
+            $validation_error = [];
+
+            if(!isset($data['account_id'])){
+                array_push($validation_error,"account_id is required");
+            }
+
+            if(sizeof($validation_error)>0){
+                return ["status"=>false,"message"=>$validation_error];
+            }
+
+            return ['status'=>true];
+
+        }catch (\Exception $ex){
+            return ["status"=>false,"message"=>"validation exception, contact developer for support","ex"=>$ex];
+        }
+    }
+
+    /**
+     * @param array $data = {
+     *              receiver_id : string
+     *              order_id : string
+     *              payment_breakup : array[] = [{
+     *                                               type: string,
+     *                                               amount: string|numeric
+     *                                          }]
+     *              }
+     * @return array [] = {
+     *                  status : boolean
+     *                  message : string
+     *                  transaction_id : string
+     *                  transaction_type : string
+     *                  transaction_status : array = [{
+     *                                                  resultStatus: string,
+     *                                                  message : string,
+     *                                                  status_response : array = [{
+     *                                                                             transaction_id : string,
+     *                                                                             payment_method : string,
+     *                                                                             status : string
+     *                                                                            }]
+     *                                               }]
+     *                  wallet_balance : string
+     *              }
+     * @example { status: true, message: 'Money added to Wallet.', transaction_id:'323-1dca-cada-acc', transaction_type: 'input_wallet', transaction_status: { resultStatus: 'SUCCESS', message : 'input_wallet payment successful', status_response:[{ transaction_id : '323-1dca-cada-acc' , payment_method : 'input_wallet', status: 'success' }]} , wallet_balance: '2300'}
+     */
 
     public function addMoneyToRetailerWallet(array $data=[]){
         try{
@@ -195,6 +300,34 @@ class PaymentClient
         }
     }
 
+
+    /**
+     * @param array $data = {
+     *              receiver_id : string
+     *              order_id : string
+     *              payment_breakup : array[] = [{
+     *                                               type: string,
+     *                                               amount: string|numeric
+     *                                          }]
+     *              }
+     * @return array [] = {
+     *                  status : boolean
+     *                  message : string
+     *                  transaction_id : string
+     *                  transaction_type : string
+     *                  transaction_status : array = [{
+     *                                                  resultStatus: string,
+     *                                                  message : string,
+     *                                                  status_response : array = [{
+     *                                                                             transaction_id : string,
+     *                                                                             payment_method : string,
+     *                                                                             status : string
+     *                                                                            }]
+     *                                               }]
+     *                  wallet_balance : string
+     *              }
+     * @example { status: true, message: 'Money added to Wallet.', transaction_id:'323-1dca-cada-acc', transaction_type: 'input_wallet', transaction_status: { resultStatus: 'SUCCESS', message : 'input_wallet payment successful', status_response:[{ transaction_id : '323-1dca-cada-acc' , payment_method : 'input_wallet', status: 'success' }]} , wallet_balance: '2300'}
+     */
     public function addMoneyToSupplierWallet(array $data=[]){
         try{
 
@@ -265,6 +398,34 @@ class PaymentClient
         }
     }
 
+
+    /**
+     * @param array $data = {
+     *              receiver_id : string
+     *              order_id : string
+     *              payment_breakup : array[] = [{
+     *                                               type: string,
+     *                                               amount: string|numeric
+     *                                          }]
+     *              }
+     * @return array [] = {
+     *                  status : boolean
+     *                  message : string
+     *                  transaction_id : string
+     *                  transaction_type : string
+     *                  transaction_status : array = [{
+     *                                                  resultStatus: string,
+     *                                                  message : string,
+     *                                                  status_response : array = [{
+     *                                                                             transaction_id : string,
+     *                                                                             payment_method : string,
+     *                                                                             status : string
+     *                                                                            }]
+     *                                               }]
+     *                  wallet_balance : string
+     *              }
+     * @example { status: true, message: 'Money added to Wallet.', transaction_id:'323-1dca-cada-acc', transaction_type: 'input_wallet', transaction_status: { resultStatus: 'SUCCESS', message : 'input_wallet payment successful', status_response:[{ transaction_id : '323-1dca-cada-acc' , payment_method : 'input_wallet', status: 'success' }]} , wallet_balance: '2300'}
+     */
     public function addMoneyToFarmerWallet(array $data=[]){
         try{
 
@@ -331,6 +492,32 @@ class PaymentClient
         }
     }
 
+    /**
+     * @param array $data = {
+     *              receiver_id : string
+     *              order_id : string
+     *              payment_breakup : array[] = [{
+     *                                               type: string,
+     *                                               amount: string|numeric
+     *                                          }]
+     *              }
+     * @return array [] = {
+     *                  status : boolean
+     *                  message : string
+     *                  transaction_id : string
+     *                  transaction_type : string
+     *                  transaction_status : array = [{
+     *                                                  resultStatus: string,
+     *                                                  message : string,
+     *                                                  status_response : array = [{
+     *                                                                             transaction_id : string,
+     *                                                                             payment_method : string,
+     *                                                                             status : string
+     *                                                                            }]
+     *                                               }]
+     *              }
+     * @example { status: true, message: 'Transaction processed.', transaction_id:'323-1dca-cada-acc', transaction_type: 'cash', transaction_status: { resultStatus: 'SUCCESS', message : 'cash payment successful', status_response:[{ transaction_id : '323-1dca-cada-acc' , payment_method : 'cash', status: 'success' }]} }
+     */
     public function doRequest(array $data=[]){
         try{
 
@@ -401,6 +588,33 @@ class PaymentClient
         }
     }
 
+
+    /**
+     * @param array $data = {
+     *              receiver_id : string
+     *              order_id : string
+     *              payment_breakup : array[] = [{
+     *                                               type: string,
+     *                                               amount: string|numeric
+     *                                          }]
+     *              }
+     * @return array [] = {
+     *                  status : boolean
+     *                  message : string
+     *                  transaction_id : string
+     *                  transaction_type : string
+     *                  transaction_status : array = [{
+     *                                                  resultStatus: string,
+     *                                                  message : string,
+     *                                                  status_response : array = [{
+     *                                                                             transaction_id : string,
+     *                                                                             payment_method : string,
+     *                                                                             status : string
+     *                                                                            }]
+     *                                               }]
+     *              }
+     * @example { status: true, message: 'Transaction processed.', transaction_id:'323-1dca-cada-acc', transaction_type: 'cash', transaction_status: { resultStatus: 'SUCCESS', message : 'cash payment successful', status_response:[{ transaction_id : '323-1dca-cada-acc' , payment_method : 'cash', status: 'success' }]} }
+     */
     public function doRequestRetailer(array $data=[]){
         try{
             $data['receiver_id'] = self::AKSHAMAALA_USER_ID;
@@ -471,6 +685,31 @@ class PaymentClient
         }
     }
 
+
+    /**
+     * @param array $data = {
+     *              amount : string,
+     *              order_id : string,
+     *              user_id : string,
+     *              user_type : string,
+     *              total_amount : string
+     * @return array [] = {
+     *                  status : boolean
+     *                  message : string
+     *                  transaction_id : string
+     *                  transaction_type : string
+     *                  transaction_status : array = [{
+     *                                                  resultStatus: string,
+     *                                                  message : string,
+     *                                                  status_response : array = [{
+     *                                                                             transaction_id : string,
+     *                                                                             payment_method : string,
+     *                                                                             status : string
+     *                                                                            }]
+     *                                               }]
+     *              }
+     * @example { status: true, message: 'Fund transfer requested.', transaction_id:'323-1dca-cada-acc', transaction_type: 'fund_transfer', transaction_status: { resultStatus: 'REQUESTED', message : 'fund transfer payment requested', status_response:[{ transaction_id : '323-1dca-cada-acc' , payment_method : 'fund_transfer', status: 'requested' }]} }
+     */
     public function requestFundTransfer(array $data=[]){
         try{
                 $validation = $this->validateFundTransferRequest($data);
@@ -523,6 +762,23 @@ class PaymentClient
         }
     }
 
+
+    /**
+     * @param array $data = {
+     *              order_id : string,
+     *              transaction_id : string
+     *              }
+     * @return array [] = {
+     *                  resultStatus: string,
+     *                  message : string
+     *                  status_response : array = [{
+     *                                                 transaction_id : string,
+     *                                                 payment_method : string,
+     *                                                 status : string
+     *                                            }]
+     *              }
+     * @example {  message: 'Transaction status fetched.', resultStatus: 'SUCCESS',status_response:[{ transaction_id : '323-1dca-cada-acc' , payment_method : 'fund_transfer', status: 'success' }] }
+     */
     public function checkStatus(array $data=[]){
 
         try{
@@ -586,6 +842,22 @@ class PaymentClient
 
     }
 
+
+    /**
+     * @param array $data = {
+     *              driver_response : json,
+     *              transaction_id : string
+     *              }
+     * @return array [] = {
+     *                  message : string
+     *                  resultStatus: string,
+     *                  status_response : array = [{
+     *                                             payment_method : string,
+     *                                             status : string
+     *                                            }]
+     *              }
+     * @example { message: '', resultStatus: 'SUCCESS', status_response:[{ payment_method : 'fund_transfer', status: 'requested' }] }
+     */
     public function validateStatus(array $data=[]){
 
         try{
@@ -645,6 +917,22 @@ class PaymentClient
 
     }
 
+
+    /**
+     * @param array $data = {
+     *              user_id : string,
+     *              machine_type : string
+     *              }
+     * @return array [] = {
+     *                  message : string
+     *                  resultStatus: string,
+     *                  status_response : array = [{
+     *                                             payment_method : string,
+     *                                             status : string
+     *                                            }]
+     *              }
+     * @example { status: true, message: '', data:{ user_id : '1', machine_type: 'paytm', machine_tid: '323uaocan' } }
+     */
     public function registerMachine(array $data =[]) {
 
         try{
@@ -696,6 +984,21 @@ class PaymentClient
 
     }
 
+
+    /**
+     * @param array $data = {
+     *              user_id : string
+     *              }
+     * @return array [] = {
+     *                  message : string
+     *                  resultStatus: string,
+     *                  status_response : array = [{
+     *                                             payment_method : string,
+     *                                             status : string
+     *                                            }]
+     *              }
+     * @example { status: true, message: '', data:{  machine_type: 'paytm', machine_tid: '323uaocan' } }
+     */
     public function getMachine(array $data = []) {
         try{
             $user_id = $data['user_id'];
@@ -735,6 +1038,23 @@ class PaymentClient
         }
     }
 
+
+    /**
+     * @param array $data = {
+     *              order_id : string
+     *              }
+     * @return array [] = {
+     *                  message : string
+     *                  status: boolean,
+     *                  data : array = {
+     *                            transaction_id : string,
+     *                            order_id : string,
+     *                            amount : string,
+     *                            status : string
+     *                          }
+     *              }
+     * @example { status: true, message: 'status fetched', data:{  transaction_id: '1121k2ndo', order_id: '332312bu', amount :'12', status: 'success' } }
+     */
     public function fundTransferStatus(array $data = []) {
         try{
             $client = new Client();
@@ -774,9 +1094,9 @@ class PaymentClient
     }
 
     public function revert(array $data=[]){
-        
+
         try{
-            
+
             if (!$data['transaction_ids']) {
                 throw new \Exception("Invalid Request parameters");
             } else {
@@ -791,7 +1111,7 @@ class PaymentClient
                     'json' => ($data)
                 ];
                 $res = $client->post($url, $content);
-                
+
                 $response_str = $res->getBody()->getContents();
 
                 $response_data = json_decode($response_str,true);
@@ -801,7 +1121,7 @@ class PaymentClient
 
                 $message = '';
                 $status='';
-                
+
                 // var_dump($response_str);
                 return ['resultStatus'=>$response_data['status'],'message'=>$payload['message'],'status_response'=>$payload['data']];
             }
@@ -829,9 +1149,9 @@ class PaymentClient
 
 
     public function revertStatus(array $data=[]){
-        
+
         try{
-            
+
             if (!$data['transaction_ids']) {
                 throw new \Exception("Invalid Request parameters");
             } else {
@@ -846,7 +1166,7 @@ class PaymentClient
                     'json' => ($data)
                 ];
                 $res = $client->post($url, $content);
-                
+
                 $response_str = $res->getBody()->getContents();
 
                 $response_data = json_decode($response_str,true);
@@ -856,7 +1176,7 @@ class PaymentClient
 
                 $message = '';
                 $status='';
-                
+
 
                 return ['resultStatus'=>$response_data['status'],'message'=>$payload['message'],'status_respones'=>$payload['data']];
             }
@@ -883,8 +1203,20 @@ class PaymentClient
     }
 
 
-
-
+    /**
+     * @param array $data = {
+     *              retailer_id : string
+     *              }
+     * @return array [] = {
+     *                  code : integer
+     *                  message : string
+     *                  status: boolean,
+     *                  data : array = {
+     *                            balance : string
+     *                          }
+     *              }
+     * @example { code : 201, status: true, message: 'retailer's account and wallet created', data:{  balance: '0' } }
+     */
     public function addRetailerWallet(array $data = []) {
         try{
             $client = new Client();
@@ -899,7 +1231,7 @@ class PaymentClient
             $response_data = json_decode($response_str,true);
             $payload = $response_data['payload'];
             $payload_data=$payload['data'];
-            $message = $payload['message'];            
+            $message = $payload['message'];
             return ['code'=>$response_data['code'],'status'=>$response_data['status'],'message'=>$message,'data'=>$payload_data];
 
         }catch (ClientException $ex){
@@ -922,6 +1254,21 @@ class PaymentClient
         }
     }
 
+
+    /**
+     * @param array $data = {
+     *              supplier_id : string
+     *              }
+     * @return array [] = {
+     *                  code : integer
+     *                  message : string
+     *                  status: boolean,
+     *                  data : array = {
+     *                            balance : string
+     *                          }
+     *              }
+     * @example { code : 201, status: true, message: 'supplier's account and wallet created', data:{  balance: '0' } }
+     */
     public function addSupplierWallet(array $data = []) {
         try{
             $client = new Client();
@@ -936,7 +1283,7 @@ class PaymentClient
             $response_data = json_decode($response_str,true);
             $payload = $response_data['payload'];
             $payload_data=$payload['data'];
-            $message = $payload['message'];            
+            $message = $payload['message'];
             return ['code'=>$response_data['code'],'status'=>$response_data['status'],'message'=>$message,'data'=>$payload_data];
 
         }catch (ClientException $ex){
@@ -960,6 +1307,22 @@ class PaymentClient
     }
 
 
+
+    /**
+     * @param array $data = {
+     *              farmer_id : string,
+     *              retailer_id : string
+     *              }
+     * @return array [] = {
+     *                  code : integer
+     *                  message : string
+     *                  status: boolean,
+     *                  data : array = {
+     *                            balance : string
+     *                          }
+     *              }
+     * @example { code : 201, status: true, message: 'farmer's wallet created and linked to retailer', data:{  balance: '0' } }
+     */
     public function addFarmerWallet(array $data = []) {
         try{
             $client = new Client();
@@ -998,6 +1361,29 @@ class PaymentClient
         }
     }
 
+
+    /**
+     * @param array $data = {
+     *              transaction_id : string,
+     *              otp : string
+     *              }
+     * @return array [] = {
+     *                  status : boolean
+     *                  message : string
+     *                  transaction_id : string
+     *                  transaction_type : string
+     *                  transaction_status : array = [{
+     *                                                  resultStatus: string,
+     *                                                  message : string,
+     *                                                  status_response : array = [{
+     *                                                                             transaction_id : string,
+     *                                                                             payment_method : string,
+     *                                                                             status : string
+     *                                                                            }]
+     *                                               }]
+     *              }
+     * @example { status: true, message: 'OTP verified and wallet updated.', transaction_id:'323-1dca-cada-acc', transaction_type: 'input_wallet', transaction_status: { resultStatus: 'SUCCESS', message : 'input_wallet payment successful', status_response:[{ transaction_id : '323-1dca-cada-acc' , payment_method : 'input_wallet', status: 'success' }]}}
+     */
     public function verifyOtpInputWallet(array $data = []) {
         try{
             $client = new Client();
@@ -1028,7 +1414,7 @@ class PaymentClient
                 }
             }
             $transaction_status=['resultStatus'=>$statusResult,'message'=>$messageStatus,'status_response'=>$payload_data['transaction_status']];
-            return ['status'=>$response_data['status'],'message'=>$message,'transaction_id'=>implode(':',$payload_data['transaction_id']),'transaction_type'=>implode(':',$payload_data['transaction_type']),'transaction_status'=>$transaction_status,'wallet_balance'=>$payload_data['wallet_balance']];        
+            return ['status'=>$response_data['status'],'message'=>$message,'transaction_id'=>implode(':',$payload_data['transaction_id']),'transaction_type'=>implode(':',$payload_data['transaction_type']),'transaction_status'=>$transaction_status,'wallet_balance'=>$payload_data['wallet_balance']];
         }catch (ClientException $ex){
             if($ex->hasResponse()){
                 $response_data = json_decode($ex->getResponse()->getBody()->getContents(),true);
@@ -1049,6 +1435,28 @@ class PaymentClient
         }
     }
 
+    /**
+     * @param array $data = {
+     *              transaction_id : string,
+     *              otp : string
+     *              }
+     * @return array [] = {
+     *                  status : boolean
+     *                  message : string
+     *                  transaction_id : string
+     *                  transaction_type : string
+     *                  transaction_status : array = [{
+     *                                                  resultStatus: string,
+     *                                                  message : string,
+     *                                                  status_response : array = [{
+     *                                                                             transaction_id : string,
+     *                                                                             payment_method : string,
+     *                                                                             status : string
+     *                                                                            }]
+     *                                               }]
+     *              }
+     * @example { status: true, message: 'OTP verified and payment done.', transaction_id:'323-1dca-cada-acc', transaction_type: 'unnati_credit', transaction_status: { resultStatus: 'SUCCESS', message : 'unnati_credit payment successful', status_response:[{ transaction_id : '323-1dca-cada-acc' , payment_method : 'unnati_credit', status: 'success' }]}}
+     */
     public function verifyOtpChottaCredit(array $data = []) {
         try{
             $client = new Client();
@@ -1079,7 +1487,7 @@ class PaymentClient
                 }
             }
             $transaction_status=['resultStatus'=>$statusResult,'message'=>$messageStatus,'status_response'=>$payload_data['transaction_status']];
-            return ['status'=>$response_data['status'],'message'=>$message,'transaction_id'=>implode(':',$payload_data['transaction_id']),'transaction_type'=>implode(':',$payload_data['transaction_type']),'transaction_status'=>$transaction_status,'wallet_balance'=>$payload_data['wallet_balance']];        
+            return ['status'=>$response_data['status'],'message'=>$message,'transaction_id'=>implode(':',$payload_data['transaction_id']),'transaction_type'=>implode(':',$payload_data['transaction_type']),'transaction_status'=>$transaction_status,'wallet_balance'=>$payload_data['wallet_balance']];
         }catch (ClientException $ex){
             if($ex->hasResponse()){
                 $response_data = json_decode($ex->getResponse()->getBody()->getContents(),true);
@@ -1100,6 +1508,28 @@ class PaymentClient
         }
     }
 
+
+    /**
+     * @param array $data = {
+     *              transaction_id : string
+     *              }
+     * @return array [] = {
+     *                  status : boolean
+     *                  message : string
+     *                  transaction_id : string
+     *                  transaction_type : string
+     *                  transaction_status : array = [{
+     *                                                  resultStatus: string,
+     *                                                  message : string,
+     *                                                  status_response : array = [{
+     *                                                                             transaction_id : string,
+     *                                                                             payment_method : string,
+     *                                                                             status : string
+     *                                                                            }]
+     *                                               }]
+     *              }
+     * @example { status: true, message: 'OTP resent successfully.', transaction_id:'323-1dca-cada-acc', transaction_type: 'input_wallet', transaction_status: { resultStatus: 'PENDING', message : 'input_wallet payment pending', status_response:[{ transaction_id : '323-1dca-cada-acc' , payment_method : 'input_wallet', status: 'pending' }]}}
+     */
     public function resendOtpInputWallet(array $data = []) {
         try{
             $client = new Client();
@@ -1130,7 +1560,7 @@ class PaymentClient
                 }
             }
             $transaction_status=['resultStatus'=>$statusResult,'message'=>$messageStatus,'status_response'=>$payload_data['transaction_status']];
-            return ['status'=>$response_data['status'],'message'=>$message,'transaction_id'=>implode(':',$payload_data['transaction_id']),'transaction_type'=>implode(':',$payload_data['transaction_type']),'transaction_status'=>$transaction_status];        
+            return ['status'=>$response_data['status'],'message'=>$message,'transaction_id'=>implode(':',$payload_data['transaction_id']),'transaction_type'=>implode(':',$payload_data['transaction_type']),'transaction_status'=>$transaction_status];
         }catch (ClientException $ex){
             if($ex->hasResponse()){
                 $response_data = json_decode($ex->getResponse()->getBody()->getContents(),true);
@@ -1151,6 +1581,28 @@ class PaymentClient
         }
     }
 
+
+    /**
+     * @param array $data = {
+     *              transaction_id : string
+     *              }
+     * @return array [] = {
+     *                  status : boolean
+     *                  message : string
+     *                  transaction_id : string
+     *                  transaction_type : string
+     *                  transaction_status : array = [{
+     *                                                  resultStatus: string,
+     *                                                  message : string,
+     *                                                  status_response : array = [{
+     *                                                                             transaction_id : string,
+     *                                                                             payment_method : string,
+     *                                                                             status : string
+     *                                                                            }]
+     *                                               }]
+     *              }
+     * @example { status: true, message: 'OTP resent successfully', transaction_id:'323-1dca-cada-acc', transaction_type: 'unnati_credit', transaction_status: { resultStatus: 'PENDING', message : 'unnati_credit payment pending', status_response:[{ transaction_id : '323-1dca-cada-acc' , payment_method : 'unnati_credit', status: 'pending' }]}}
+     */
     public function resendOtpChottaCredit(array $data = []) {
         try{
             $client = new Client();
@@ -1181,7 +1633,7 @@ class PaymentClient
                 }
             }
             $transaction_status=['resultStatus'=>$statusResult,'message'=>$messageStatus,'status_response'=>$payload_data['transaction_status']];
-            return ['status'=>$response_data['status'],'message'=>$message,'transaction_id'=>implode(':',$payload_data['transaction_id']),'transaction_type'=>implode(':',$payload_data['transaction_type']),'transaction_status'=>$transaction_status];        
+            return ['status'=>$response_data['status'],'message'=>$message,'transaction_id'=>implode(':',$payload_data['transaction_id']),'transaction_type'=>implode(':',$payload_data['transaction_type']),'transaction_status'=>$transaction_status];
         }catch (ClientException $ex){
             if($ex->hasResponse()){
                 $response_data = json_decode($ex->getResponse()->getBody()->getContents(),true);
@@ -1202,6 +1654,20 @@ class PaymentClient
         }
     }
 
+    /**
+     * @param array $data = {
+     *              retailer_id : string
+     *              }
+     * @return array [] = {
+     *                  message : string
+     *                  status: boolean,
+     *                  data : array = {
+     *                            balance : string,
+     *                            retailer_id : string
+     *                          }
+     *              }
+     * @example { code : 201, status: true, message: 'retailer balance fetched.', data:{  balance: '123', retailer_id: '845' } }
+     */
     public function getBalanceRetailer(array $data = []) {
         try{
             // var_dump($this->app_key);
@@ -1239,6 +1705,28 @@ class PaymentClient
         }
     }
 
+
+    /**
+     * @param array $data = {
+     *              retailer_id : string
+     *              }
+     * @return array [] = {
+     *                  message : string
+     *                  status: boolean,
+     *                  data : array = {
+     *                            transactions : array[{
+     *                                  from: string,
+     *                                  to: string,
+     *                                  amount:  string,
+     *                                  meta: json,
+     *                                  transfer_uuid: string,
+     *                                  created_at: string,
+     *                                  type: string
+     *                              }]
+     *                          }
+     *              }
+     * @example { status: true, message: 'retailer transactions fetched.', data:{ transactions:[{from:"RETAILER:3434",to:"FARMER:4323",amount:"231"}] }
+     */
     public function getTransactionsRetailer(array $data = []) {
         try{
             // var_dump($this->app_key);
@@ -1276,6 +1764,21 @@ class PaymentClient
         }
     }
 
+
+    /**
+     * @param array $data = {
+     *              supplier_id : string
+     *              }
+     * @return array [] = {
+     *                  message : string
+     *                  status: boolean,
+     *                  data : array = {
+     *                            balance : string,
+     *                            supplier_id : string
+     *                          }
+     *              }
+     * @example { code : 201, status: true, message: 'supplier balance fetched.', data:{  balance: '123', supplier_id: '845' } }
+     */
     public function getBalanceSupplier(array $data = []) {
         try{
             // var_dump($this->app_key);
@@ -1317,6 +1820,21 @@ class PaymentClient
         }
     }
 
+
+    /**
+     * @param array $data = {
+     *              supplier_id : string
+     *              }
+     * @return array [] = {
+     *                  message : string
+     *                  status: boolean,
+     *                  data : array = {
+     *                            balance : string,
+     *                            supplier_id : string
+     *                          }
+     *              }
+     * @example { code : 201, status: true, message: 'supplier main-account balance fetched.', data:{  balance: '123', supplier_id: '845' } }
+     */
     public function getMainAccountBalanceSupplier(array $data = []) {
         try{
             // var_dump($this->app_key);
@@ -1357,6 +1875,24 @@ class PaymentClient
         }
     }
 
+
+    /**
+     * @param array $data = {
+     *              order_id : string,
+     *              supplier_id : string
+     *              }
+     * @return array [] = {
+     *                  code : integer,
+     *                  message : string
+     *                  status: boolean,
+     *                  data : array = {
+     *                            success : string,
+     *                            pending : string,
+     *                            requested : string
+     *                          }
+     *              }
+     * @example { code : 201, status: true, message: '.', data:{  success: '123', pending: '845', requested: '3121' } }
+     */
     public function getSupplierFundTransferByOrderId(array $data = []) {
         try{
             // var_dump($this->app_key);
@@ -1397,15 +1933,30 @@ class PaymentClient
         }
     }
 
+
+    /**
+     * @param array $data = {
+     *              farmer_ids : string []
+     *              }
+     * @return array [] = {
+     *                  message : string
+     *                  status: boolean,
+     *                  data : array = {
+     *                            farmers : array[{}],
+     *                            farmer_ids : string []
+     *                          }
+     *              }
+     * @example { code : 201, status: true, message: 'farmer balance fetched.', data:{  "farmers": { "122230": { "mapped_retailer_ids": ["535"],"balance": "4300","farmer_id": 122230}},"farmer_ids": [122230] } }
+     */
     public function getBalanceFarmer(array $data = []) {
         try{
             $client = new Client();
-            $url = $this->base_url.'/wallets/farmers';
+            $url = $this->base_url.'/wallets/balance/farmers';
             $client->setDefaultOption('headers', [ 'Content-Type' => 'application/json','app-key'=>$this->app_key ]);
             $content = [
                 'json' => $data
             ];
-            $res = $client->get($url,$content);
+            $res = $client->post($url,$content);
             $response_str = $res->getBody()->getContents();
             $response_data = json_decode($response_str,true);
             $payload = $response_data['payload'];
@@ -1433,6 +1984,28 @@ class PaymentClient
         }
     }
 
+
+    /**
+     * @param array $data = {
+     *              farmer_id : string
+     *              }
+     * @return array [] = {
+     *                  message : string
+     *                  status: boolean,
+     *                  data : array = {
+     *                            transactions : array[{
+     *                                  from: string,
+     *                                  to: string,
+     *                                  amount:  string,
+     *                                  meta: json,
+     *                                  transfer_uuid: string,
+     *                                  created_at: string,
+     *                                  type: string
+     *                              }]
+     *                          }
+     *              }
+     * @example { status: true, message: 'farmer transactions fetched.', data:{ transactions:[{from:"FARMER:3434",to:"RETAILER:4323",amount:"231"}] }
+     */
     public function getTransactionsFarmer(array $data = []) {
         try{
             $client = new Client();
@@ -1466,20 +2039,277 @@ class PaymentClient
             return ["status"=>false,"message"=>"some client error, contact to developer",'ex'=>$ex];
         }
     }
-    
+
+
+    /**
+     * @param array $data = {
+     *              user_type : string,
+     *              user_id : string,
+     *              phone_number : string,
+     *              account_number : string,
+     *              ifsc : string,
+     *              name : string,
+     *              }
+     * @return array [] = {
+     *                  code : integer,
+     *                  message : string
+     *                  status: boolean,
+     *                  data : array []
+     *              }
+     * @example { code : 201, status: true, message: 'User created and bank details registered successfully.', data:{} }
+     */
     public function addUserAndBeneficiary(array $data = []) {
 
         try{
+            $validation = $this->validateBeneficiariesData($data);
+            if (!$validation['status']) {
+                return $validation;
+            } else {
+                $client = new Client();
+                $url = $this->base_url.'/beneficiaries';
+                $client->setDefaultOption('headers', [ 'Content-Type' => 'application/json','app-key'=>$this->app_key ]);
+                $head = [];
+                $body = $data;
+                $content = [
+                    'json' => ($data)
+                ];
+                $res = $client->post($url, $content);
+
+                $response_str = $res->getBody()->getContents();
+                $response_data = json_decode($response_str,true);
+                $payload = $response_data['payload'];
+                $payload_data = $payload['data'];
+                $message = $payload['message'];
+                return ['code'=>$response_data['code'],'status'=>$response_data['status'],'message'=>$message,'data'=>$payload_data];
+            }
+        }catch (ClientException $ex){
+            if($ex->hasResponse()){
+                $response_data = json_decode($ex->getResponse()->getBody()->getContents(),true);
+                $payload = $response_data['payload'];
+                return ['status'=>false,"message"=>$payload['message']];
+            }
+            return ['status'=>false,'message'=>"some payment client connection error with no error response"];
+        }catch (RequestException $ex){
+            if($ex->hasResponse()){
+                $response_data = json_decode($ex->getResponse()->getBody()->getContents(),true);
+                $payload = $response_data['payload'];
+                return ['status'=>false,"message"=>$payload['message']];
+            }
+            return ['status'=>false,'message'=>"some payment service connection error with no error response"];
+        }
+        catch (\Exception $ex){
+            return ["status"=>false,"message"=>"some client error, contact to developer",'ex'=>$ex];
+        }
+    }
+
+
+    /**
+     * @param array $data = {
+     *              user_type : string,
+     *              user_id : string,
+     *              }
+     * @return array [] = {
+     *                  code : integer,
+     *                  message : string
+     *                  status: boolean,
+     *                  data : array = {
+     *                                  account_id: string,
+     *                                  user_id: string,
+     *                                  user_type: string,
+     *                                  account_status: string,
+     *                                  account_verification: string,
+     *                                  account_number: string,
+     *                                  ifsc: string
+     *                                 }
+     *              }
+     * @example { code : 201, status: true, message: 'Beneficiary detailed fetched successfully.', data:{account_id:'1',user_id:'22',user_type:'VENDOR',account_status:'success',account_verification:'success',account_number:'131231312313',ifsc:'PYTM0123456'} }
+     */
+    public function getBeneficiary(array $data = []) {
+
+        try{
+            $validation = $this->validateGetBeneficiariesData($data);
+            if (!$validation['status']) {
+                return $validation;
+            } else {
+                $client = new Client();
+
+                $url = $this->base_url.'/beneficiaries/'.$data['user_type'].'/'.$data['user_id'];
+                $client->setDefaultOption('headers', [ 'Content-Type' => 'application/json','app-key'=>$this->app_key ]);
+                $res = $client->get($url);
+
+                $response_str = $res->getBody()->getContents();
+                $response_data = json_decode($response_str,true);
+                $payload = $response_data['payload'];
+                $payload_data = $payload['data'];
+                $message = $payload['message'];
+                return ['code'=>$response_data['code'],'status'=>$response_data['status'],'message'=>$message,'data'=>$payload_data];
+            }
+        }catch (ClientException $ex){
+            if($ex->hasResponse()){
+                $response_data = json_decode($ex->getResponse()->getBody()->getContents(),true);
+                $payload = $response_data['payload'];
+                return ['status'=>false,"message"=>$payload['message']];
+            }
+            return ['status'=>false,'message'=>"some payment client connection error with no error response"];
+        }catch (RequestException $ex){
+            if($ex->hasResponse()){
+                $response_data = json_decode($ex->getResponse()->getBody()->getContents(),true);
+                $payload = $response_data['payload'];
+                return ['status'=>false,"message"=>$payload['message']];
+            }
+            return ['status'=>false,'message'=>"some payment service connection error with no error response"];
+        }
+        catch (\Exception $ex){
+            return ["status"=>false,"message"=>"some client error, contact to developer",'ex'=>$ex];
+        }
+    }
+
+
+    /**
+     * @param array $data = {
+     *              account_id : string
+     *              }
+     * @return array [] = {
+     *                  code : integer,
+     *                  message : string
+     *                  status: boolean,
+     *                  data : array = []
+     *              }
+     * @example { code : 201, status: true, message: 'Beneficiary deleted.', data:{} }
+     */
+    public function deleteBeneficiary(array $data = []) {
+
+        try{
+            $validation = $this->validateDeleteBeneficiariesData($data);
+            if (!$validation['status']) {
+                return $validation;
+            } else {
+                $client = new Client();
+                $url = $this->base_url.'/beneficiaries';
+                $client->setDefaultOption('headers', [ 'Content-Type' => 'application/json','app-key'=>$this->app_key ]);
+                $head = [];
+                $body = $data;
+                $content = [
+                    'json' => ($data)
+                ];
+                $res = $client->delete($url, $content);
+
+                $response_str = $res->getBody()->getContents();
+                $response_data = json_decode($response_str,true);
+                $payload = $response_data['payload'];
+                $payload_data = $payload['data'];
+                $message = $payload['message'];
+                return ['code'=>$response_data['code'],'status'=>$response_data['status'],'message'=>$message,'data'=>$payload_data];
+            }
+        }catch (ClientException $ex){
+            if($ex->hasResponse()){
+                $response_data = json_decode($ex->getResponse()->getBody()->getContents(),true);
+                $payload = $response_data['payload'];
+                return ['status'=>false,"message"=>$payload['message']];
+            }
+            return ['status'=>false,'message'=>"some payment client connection error with no error response"];
+        }catch (RequestException $ex){
+            if($ex->hasResponse()){
+                $response_data = json_decode($ex->getResponse()->getBody()->getContents(),true);
+                $payload = $response_data['payload'];
+                return ['status'=>false,"message"=>$payload['message']];
+            }
+            return ['status'=>false,'message'=>"some payment service connection error with no error response"];
+        }
+        catch (\Exception $ex){
+            return ["status"=>false,"message"=>"some client error, contact to developer",'ex'=>$ex];
+        }
+    }
+
+
+    /**
+     * @param array $data = {
+     *              account_id : string
+     *              }
+     * @return array [] = {
+     *                  code : integer,
+     *                  message : string
+     *                  status: boolean,
+     *                  data : array = []
+     *              }
+     * @example { code : 201, status: true, message: 'Verification Initiated.', data:{} }
+     */
+    public function verifyBeneficiary(array $data = []) {
+
+        try{
+            $validation = $this->validateDeleteBeneficiariesData($data);
+            if (!$validation['status']) {
+                return $validation;
+            } else {
+                $client = new Client();
+                $url = $this->base_url.'/beneficiaries/verify';
+                $client->setDefaultOption('headers', [ 'Content-Type' => 'application/json','app-key'=>$this->app_key ]);
+                $head = [];
+                $body = $data;
+                $content = [
+                    'json' => ($data)
+                ];
+                $res = $client->post($url, $content);
+
+                $response_str = $res->getBody()->getContents();
+                $response_data = json_decode($response_str,true);
+                $payload = $response_data['payload'];
+                $payload_data = $payload['data'];
+                $message = $payload['message'];
+                return ['code'=>$response_data['code'],'status'=>$response_data['status'],'message'=>$message,'data'=>$payload_data];
+            }
+        }catch (ClientException $ex){
+            if($ex->hasResponse()){
+                $response_data = json_decode($ex->getResponse()->getBody()->getContents(),true);
+                $payload = $response_data['payload'];
+                return ['status'=>false,"message"=>$payload['message']];
+            }
+            return ['status'=>false,'message'=>"some payment client connection error with no error response"];
+        }catch (RequestException $ex){
+            if($ex->hasResponse()){
+                $response_data = json_decode($ex->getResponse()->getBody()->getContents(),true);
+                $payload = $response_data['payload'];
+                return ['status'=>false,"message"=>$payload['message']];
+            }
+            return ['status'=>false,'message'=>"some payment service connection error with no error response"];
+        }
+        catch (\Exception $ex){
+            return ["status"=>false,"message"=>"some client error, contact to developer",'ex'=>$ex];
+        }
+    }
+    /*** --- Get Supplier Wallet Transaction (Abhilash)
+     * @param array $data = {
+     *              account_id : string,
+     *              date_start : string,
+     *              date_end : string
+     *              }
+     * @return array [] = {
+     *                  code : integer,
+     *                  message : string
+     *                  status: boolean,
+     *                  data : {
+     *                        "wallet_id": int,
+     *                        "type": string,
+                              "amount": string,
+                              "confirmed": boolean,
+                              "meta": json,
+                              "created_at": timestamp
+     *              }
+     *              }
+     * @example { code : 200, status: true, message: "", data:{"wallet_id": 808, * "type": "withdraw", "amount": "-234000", "confirmed": 1, "meta": "{\"type\": \"FUND_TRANSFER\", * \"amount\": \"234000\", * \"order_id\": \"b2ad0ee6-7156-4eef-ad0e-565b49f04f1c\", * \"paid_to_id\": \"308\", * \"paid_to_type\": \"PRODUCT_SUPPLIER\", * \"total_amount\": \"234000\", * \"transaction_id\": \"5ff3fa7255915\"}", "uuid": "7ba68d1c-f6d9-4792-af3d-3d383d759c13", "created_at": "2021-01-05 07:00:59"} }
+     */
+    public function getSupplierWalletTransactions(array $data = []) {
+        try{
+
             $client = new Client();
-            $url = $this->base_url.'/bankaccount/addUserAndBeneficiary';
+            $url = $this->base_url.'/wallets/supplier/'.$data['supplier_id'].'/transactions';
             $client->setDefaultOption('headers', [ 'Content-Type' => 'application/json','app-key'=>$this->app_key ]);
             $head = [];
             $body = $data;
             $content = [
                 'json' => ($data)
             ];
-            $res = $client->post($url, $content);
-
+            $res = $client->get($url, $content);
             $response_str = $res->getBody()->getContents();
             $response_data = json_decode($response_str,true);
             $payload = $response_data['payload'];
