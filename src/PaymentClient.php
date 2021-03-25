@@ -2336,5 +2336,68 @@ class PaymentClient
             return ["status"=>false,"message"=>"some client error, contact to developer",'ex'=>$ex];
         }
     }
+/*** --- Get All Card Transaction (Abhilash)
+     *  @param array $data = {
+     *              user_type: string
+     *              user_id: string
+     *              start_date : string,
+     *              end_date : string
+     *              }
+     * @return array [] = {
+     *                  code : integer,
+     *                  message : string
+     *                  status: boolean,
+     *                  data : {
+     *                       "order_id": string,
+     *                       "receiver_id": string,
+     *                       "amount": int,
+     *           "payment_method": string,
+     *           "status": boolean,
+     *           "settlement_amount": string,
+     *           "created_at": timestamp,
+     *           "commission": int,
+     *           "bankname": string,
+     *           "txnid": string,
+     *           "gst": int
+     *              }
+     *              }
+     * @example { "code": 200, "status": true, "payload": { "message": "", "data": [ { "order_id": "AKSHAMAALA_ORDER:57772", "receiver_id": "RETAILER:540", "amount": "500", "payment_method": "paytm", "status": "success", "settlement_amount": "500.00", "created_at": "2021-03-09 04:39:41", "commission": "0.00", "bankname": "Cooperative Bank", "txnid": "20210309111212800110168404488014024", "gst": "0.00" }]}
+     */
+    public function getAllCardsTransactions(array $data = []) {
+        try{
+            $client = new Client();
+            $url = $this->base_url.'/users/'.$data['user_type'].'/'.$data['user_id'].'/cards';
+            $client->setDefaultOption('headers', [ 'Content-Type' => 'application/json','app-key'=>$this->app_key ]);
+            $head = [];
+            $body = $data;
+            $content = [
+                'json' => ($data)
+            ];
+            $res = $client->get($url, $content);
+            $response_str = $res->getBody()->getContents();
+            $response_data = json_decode($response_str,true);
+            $payload = $response_data['payload'];
+            $payload_data = $payload['data'];
+            $message = $payload['message'];
+            return ['code'=>$response_data['code'],'status'=>$response_data['status'],'message'=>$message,'data'=>$payload_data];
 
+        }catch (ClientException $ex){
+            if($ex->hasResponse()){
+                $response_data = json_decode($ex->getResponse()->getBody()->getContents(),true);
+                $payload = $response_data['payload'];
+                return ['status'=>false,"message"=>$payload['message']];
+            }
+            return ['status'=>false,'message'=>"some payment client connection error with no error response"];
+        }catch (RequestException $ex){
+            if($ex->hasResponse()){
+                $response_data = json_decode($ex->getResponse()->getBody()->getContents(),true);
+                $payload = $response_data['payload'];
+                return ['status'=>false,"message"=>$payload['message']];
+            }
+            return ['status'=>false,'message'=>"some payment service connection error with no error response"];
+        }
+        catch (\Exception $ex){
+            return ["status"=>false,"message"=>"some client error, contact to developer",'ex'=>$ex];
+        }
+    }
 }
