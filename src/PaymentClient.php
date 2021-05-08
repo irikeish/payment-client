@@ -17,6 +17,7 @@ class PaymentClient
     const USER_TYPE_FARMER='FARMER';
     const USER_TYPE_PRODUCT_SUPPLIER='PRODUCT_SUPPLIER';
     const USER_TYPE_OTHER_SUPPLIER='OTHER_SUPPLIER';
+    const USER_TYPE_COMMODITY_SUPPLIER='COMMODITY_SUPPLIER';
     const ORDER_TYPE_RETAILER_ORDER='RETAILER_ORDER';
     const ORDER_TYPE_AKSHAMAALA_ORDER='AKSHAMAALA_ORDER';
     const ORDER_TYPE_WALLET_TOPUP='WALLET_TOPUP';
@@ -30,7 +31,7 @@ class PaymentClient
         $this->base_url = $base_url;
         $this->app_key = $key;
     }
-
+    
     private function validateFundTransferRequest(array $data=[]){
         try{
 
@@ -190,7 +191,7 @@ class PaymentClient
             if(!isset($data['account_id'])){
                 array_push($validation_error,"account_id is required");
             }
-
+        
             if(sizeof($validation_error)>0){
                 return ["status"=>false,"message"=>$validation_error];
             }
@@ -664,7 +665,6 @@ class PaymentClient
                 $transaction_status=['resultStatus'=>$statusResult,'message'=>$messageStatus,'status_response'=>$payload_data['transaction_status']];
                 return ['status'=>$response_data['status'],'message'=>$message,'transaction_id'=>implode(':',$payload_data['transaction_id']),'transaction_type'=>implode(':',$payload_data['transaction_type']),'transaction_status'=>$transaction_status];
             }
-
         }catch (ClientException $ex){
             if($ex->hasResponse()){
                 $response_data = json_decode($ex->getResponse()->getBody()->getContents(),true);
@@ -1094,9 +1094,9 @@ class PaymentClient
     }
 
     public function revert(array $data=[]){
-
+        
         try{
-
+            
             if (!$data['transaction_ids']) {
                 throw new \Exception("Invalid Request parameters");
             } else {
@@ -1111,7 +1111,7 @@ class PaymentClient
                     'json' => ($data)
                 ];
                 $res = $client->post($url, $content);
-
+                
                 $response_str = $res->getBody()->getContents();
 
                 $response_data = json_decode($response_str,true);
@@ -1121,7 +1121,7 @@ class PaymentClient
 
                 $message = '';
                 $status='';
-
+                
                 // var_dump($response_str);
                 return ['resultStatus'=>$response_data['status'],'message'=>$payload['message'],'status_response'=>$payload['data']];
             }
@@ -1149,9 +1149,9 @@ class PaymentClient
 
 
     public function revertStatus(array $data=[]){
-
+        
         try{
-
+            
             if (!$data['transaction_ids']) {
                 throw new \Exception("Invalid Request parameters");
             } else {
@@ -1166,7 +1166,7 @@ class PaymentClient
                     'json' => ($data)
                 ];
                 $res = $client->post($url, $content);
-
+                
                 $response_str = $res->getBody()->getContents();
 
                 $response_data = json_decode($response_str,true);
@@ -1176,7 +1176,7 @@ class PaymentClient
 
                 $message = '';
                 $status='';
-
+                
 
                 return ['resultStatus'=>$response_data['status'],'message'=>$payload['message'],'status_respones'=>$payload['data']];
             }
@@ -1231,7 +1231,7 @@ class PaymentClient
             $response_data = json_decode($response_str,true);
             $payload = $response_data['payload'];
             $payload_data=$payload['data'];
-            $message = $payload['message'];
+            $message = $payload['message'];            
             return ['code'=>$response_data['code'],'status'=>$response_data['status'],'message'=>$message,'data'=>$payload_data];
 
         }catch (ClientException $ex){
@@ -1283,7 +1283,7 @@ class PaymentClient
             $response_data = json_decode($response_str,true);
             $payload = $response_data['payload'];
             $payload_data=$payload['data'];
-            $message = $payload['message'];
+            $message = $payload['message'];            
             return ['code'=>$response_data['code'],'status'=>$response_data['status'],'message'=>$message,'data'=>$payload_data];
 
         }catch (ClientException $ex){
@@ -1414,7 +1414,7 @@ class PaymentClient
                 }
             }
             $transaction_status=['resultStatus'=>$statusResult,'message'=>$messageStatus,'status_response'=>$payload_data['transaction_status']];
-            return ['status'=>$response_data['status'],'message'=>$message,'transaction_id'=>implode(':',$payload_data['transaction_id']),'transaction_type'=>implode(':',$payload_data['transaction_type']),'transaction_status'=>$transaction_status,'wallet_balance'=>$payload_data['wallet_balance']];
+            return ['status'=>$response_data['status'],'message'=>$message,'transaction_id'=>implode(':',$payload_data['transaction_id']),'transaction_type'=>implode(':',$payload_data['transaction_type']),'transaction_status'=>$transaction_status,'wallet_balance'=>$payload_data['wallet_balance']];        
         }catch (ClientException $ex){
             if($ex->hasResponse()){
                 $response_data = json_decode($ex->getResponse()->getBody()->getContents(),true);
@@ -1487,7 +1487,7 @@ class PaymentClient
                 }
             }
             $transaction_status=['resultStatus'=>$statusResult,'message'=>$messageStatus,'status_response'=>$payload_data['transaction_status']];
-            return ['status'=>$response_data['status'],'message'=>$message,'transaction_id'=>implode(':',$payload_data['transaction_id']),'transaction_type'=>implode(':',$payload_data['transaction_type']),'transaction_status'=>$transaction_status,'wallet_balance'=>$payload_data['wallet_balance']];
+            return ['status'=>$response_data['status'],'message'=>$message,'transaction_id'=>implode(':',$payload_data['transaction_id']),'transaction_type'=>implode(':',$payload_data['transaction_type']),'transaction_status'=>$transaction_status,'wallet_balance'=>$payload_data['wallet_balance']];        
         }catch (ClientException $ex){
             if($ex->hasResponse()){
                 $response_data = json_decode($ex->getResponse()->getBody()->getContents(),true);
@@ -1560,7 +1560,7 @@ class PaymentClient
                 }
             }
             $transaction_status=['resultStatus'=>$statusResult,'message'=>$messageStatus,'status_response'=>$payload_data['transaction_status']];
-            return ['status'=>$response_data['status'],'message'=>$message,'transaction_id'=>implode(':',$payload_data['transaction_id']),'transaction_type'=>implode(':',$payload_data['transaction_type']),'transaction_status'=>$transaction_status];
+            return ['status'=>$response_data['status'],'message'=>$message,'transaction_id'=>implode(':',$payload_data['transaction_id']),'transaction_type'=>implode(':',$payload_data['transaction_type']),'transaction_status'=>$transaction_status];        
         }catch (ClientException $ex){
             if($ex->hasResponse()){
                 $response_data = json_decode($ex->getResponse()->getBody()->getContents(),true);
@@ -1633,7 +1633,7 @@ class PaymentClient
                 }
             }
             $transaction_status=['resultStatus'=>$statusResult,'message'=>$messageStatus,'status_response'=>$payload_data['transaction_status']];
-            return ['status'=>$response_data['status'],'message'=>$message,'transaction_id'=>implode(':',$payload_data['transaction_id']),'transaction_type'=>implode(':',$payload_data['transaction_type']),'transaction_status'=>$transaction_status];
+            return ['status'=>$response_data['status'],'message'=>$message,'transaction_id'=>implode(':',$payload_data['transaction_id']),'transaction_type'=>implode(':',$payload_data['transaction_type']),'transaction_status'=>$transaction_status];        
         }catch (ClientException $ex){
             if($ex->hasResponse()){
                 $response_data = json_decode($ex->getResponse()->getBody()->getContents(),true);
@@ -1895,6 +1895,7 @@ class PaymentClient
      */
     public function getSupplierFundTransferByOrderId(array $data = []) {
         try{
+           // var_dump($data);die();
             // var_dump($this->app_key);
             // die();
             $client = new Client();
@@ -2060,7 +2061,7 @@ class PaymentClient
      */
     public function addUserAndBeneficiary(array $data = []) {
 
-        try{
+        try{     
             $validation = $this->validateBeneficiariesData($data);
             if (!$validation['status']) {
                 return $validation;
@@ -2336,7 +2337,7 @@ class PaymentClient
             return ["status"=>false,"message"=>"some client error, contact to developer",'ex'=>$ex];
         }
     }
-/*** --- Get All Card Transaction (Abhilash)
+ /*** --- Get All Card Transaction (Abhilash)
      *  @param array $data = {
      *              user_type: string
      *              user_id: string
@@ -2400,4 +2401,63 @@ class PaymentClient
             return ["status"=>false,"message"=>"some client error, contact to developer",'ex'=>$ex];
         }
     }
+/*** --- Get Penny Drop Details (Abhilash)
+     *  @param array $data = {
+     *              user_type: string
+     *              user_id: string
+     *              }
+     * @return array [] = {
+     *                  code : integer,
+     *                  message : string
+     *                  status: boolean,
+     *                  data : {
+     *                       "order_id": string,
+     *                       "receiver_id": string,
+     *                       "amount": int,
+     *           "meta": json,
+     *           "status": string,
+     *           "transaction_id": string,
+     *           "created_at": timestamp
+     *              }
+     *              }
+     * @example { "code": 200, "status": true, "payload": { "message": "", "data": [ { "order_id": "PENNY_DROP:3999742", "receiver_id": "PRODUCT_SUPPLIER:399", "amount": "1", "meta": "{\"benIfsc\": \"HDFC0000852\", \"benName\": \"AGARWAL AUTOMOBILES\", \"channel\": \"S2S\", \"remarks\": \"Penny drop testing: USER:399\", \"user_id\": 668, \"benAccNo\": \"50200012409742\", \"txnReqId\": \"96f6bd3f-1cb5-4e21-97ca-0c0c72df24c4\", \"user_type\": \"PRODUCT_SUPPLIER\", \"account_type\": \"ca\", \"transactionType\": \"CA_PENNY_DROP\"}", "transaction_id": "42f0f51f-9570-40dc-a875-7a9db0304155", "status": "success", "created_at": "2021-04-23 11:28:48"}]}
+     */
+    public function getPennyDropDetails(array $data = []) {
+        try{
+            $client = new Client();
+            $url = $this->base_url.'/users/'.$data['user_type'].'/'.$data['user_id'].'/penny-drop-details';
+            $client->setDefaultOption('headers', [ 'Content-Type' => 'application/json','app-key'=>$this->app_key ]);
+            $head = [];
+            $body = $data;
+            $content = [
+                'json' => ($data)
+            ];
+            $res = $client->get($url, $content);
+            $response_str = $res->getBody()->getContents();
+            $response_data = json_decode($response_str,true);
+            $payload = $response_data['payload'];
+            $payload_data = $payload['data'];
+            $message = $payload['message'];
+            return ['code'=>$response_data['code'],'status'=>$response_data['status'],'message'=>$message,'data'=>$payload_data];
+
+        }catch (ClientException $ex){
+            if($ex->hasResponse()){
+                $response_data = json_decode($ex->getResponse()->getBody()->getContents(),true);
+                $payload = $response_data['payload'];
+                return ['status'=>false,"message"=>$payload['message']];
+            }
+            return ['status'=>false,'message'=>"some payment client connection error with no error response"];
+        }catch (RequestException $ex){
+            if($ex->hasResponse()){
+                $response_data = json_decode($ex->getResponse()->getBody()->getContents(),true);
+                $payload = $response_data['payload'];
+                return ['status'=>false,"message"=>$payload['message']];
+            }
+            return ['status'=>false,'message'=>"some payment service connection error with no error response"];
+        }
+        catch (\Exception $ex){
+            return ["status"=>false,"message"=>"some client error, contact to developer",'ex'=>$ex];
+        }
+    }
+
 }
