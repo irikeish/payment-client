@@ -2459,5 +2459,74 @@ class PaymentClient
             return ["status"=>false,"message"=>"some client error, contact to developer",'ex'=>$ex];
         }
     }
+  /*** --- Get Fund Transfer Transaction by Txn Id (Abhilash)
+     *  @param array $data = {
+     *              transaction_id : string
+     *              }
+     * @return array [] = {
+     *                  code : integer,
+     *                  message : string
+     *                  status: boolean,
+     *                  data : {
+      fund_transfer_transactions": {
+                "transaction_id": string,
+                "receiver_id": int,
+                "receiver_name": string,
+                "order_type": string,
+                "amount": int,
+                "meta": json,
+                "date": string,
+                "status": boolean,
+                "requester_name": string,
+                "receiver_account_number": string,
+                "receiver_ifsc": string,
+                "created_at": timestamp,
+                "order_id": int,
+                "payment_method": string,
+                "attempts": int,
+                "override_adjustment": boolean,
+                "approver_name": string,
+                "bank_txn_id": string
+            }
+     *              }
+     *              }
+     * @example { "code": 200, "status": true, "payload": { "message": "", "data": [ {"fund_transfer_transactions": { "transaction_id": "0c582d7e-e3f4-4792-ba96-3ba139ffd217", "receiver_id": "155", "receiver_name": "GREEN TAJ FARMERS PRODUCERS COMPANY LIMITED", "order_type": "ADJUST_PAYMENT", "amount": "15", "meta": "{\"total_amount\": \"12366\", \"adjusted_amount\": \"15\"}", "date": "12-05-2021", "status": "success", "requester_name": "AGRIPOS SYSTEM", "receiver_account_number": "39652100000096", "receiver_ifsc": "PUNB0MBGB06", "created_at": "2021-05-12 08:38:20", "order_id": "211", "payment_method": "fund_transfer", "attempts": "1", "override_adjustment": 0, "approver_name": "agripos", "bank_txn_id": null }}]}
+     */
+    public function getFundTransferByTxnId(array $data = []) {
+        try{
+            $client = new Client();
+            $url = $this->base_url.'/fund-transfers/'.$data['transaction_id'];
+            $client->setDefaultOption('headers', [ 'Content-Type' => 'application/json','app-key'=>$this->app_key ]);
+            $head = [];
+            $body = $data;
+            $content = [
+                'json' => ($data)
+            ];
+            $res = $client->get($url, $content);
+            $response_str = $res->getBody()->getContents();
+            $response_data = json_decode($response_str,true);
+            $payload = $response_data['payload'];
+            $payload_data = $payload['data'];
+            $message = $payload['message'];
+            return ['code'=>$response_data['code'],'status'=>$response_data['status'],'message'=>$message,'data'=>$payload_data];
 
+        }catch (ClientException $ex){
+            if($ex->hasResponse()){
+                $response_data = json_decode($ex->getResponse()->getBody()->getContents(),true);
+                $payload = $response_data['payload'];
+                return ['status'=>false,"message"=>$payload['message']];
+            }
+            return ['status'=>false,'message'=>"some payment client connection error with no error response"];
+        }catch (RequestException $ex){
+            if($ex->hasResponse()){
+                $response_data = json_decode($ex->getResponse()->getBody()->getContents(),true);
+                $payload = $response_data['payload'];
+                return ['status'=>false,"message"=>$payload['message']];
+            }
+            return ['status'=>false,'message'=>"some payment service connection error with no error response"];
+        }
+        catch (\Exception $ex){
+            return ["status"=>false,"message"=>"some client error, contact to developer",'ex'=>$ex];
+        }
+    }
 }
